@@ -89,7 +89,12 @@ function initMenu() {
     div.appendChild(span);
 
     // Klik selectie
-    
+    div.onclick = () => {
+      document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+      div.classList.add("selected");
+      selectedCoffee = coffee.name;
+      showOptions(coffee.name);
+    };
 
     menuDiv.appendChild(div);
   });
@@ -137,7 +142,7 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
 });
 
 // Bestelling plaatsen
-document.getElementById("order-btn").addEventListener("click", placeOrder) => {
+window.placeOrder = function() {
   if (!customerName) {
     alert("Vul eerst je naam in!");
     return;
@@ -153,15 +158,15 @@ document.getElementById("order-btn").addEventListener("click", placeOrder) => {
   push(ref(db, "orders"), {
     name: customerName,
     coffee: selectedCoffee,
-    milk: document.getElementById("milk")?.checked || false,
-	sugar: document.getElementById("sugar")?.checked || false,
+    milk: milk,
+    sugar: sugar,
     time: new Date().toLocaleTimeString(),
     status: "nieuw"
   });
 
   alert(`Bestelling geplaatst, ${customerName}!`);
   location.reload();
-});
+};
 </script>
 </body>
 </html>
