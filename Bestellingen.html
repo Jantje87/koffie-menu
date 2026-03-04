@@ -73,7 +73,7 @@
   <!-- Firebase config en import -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, onValue, update, query, orderByKey } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, onValue, update, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     // Firebase configuratie
     const firebaseConfig = {
@@ -124,7 +124,7 @@
     const orderList = document.getElementById("order-list");
 
     // Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
-    const ordersQuery = query(ordersRef, orderByKey());
+    const ordersQuery = query(ordersRef, orderByChild('time'));
 
     onValue(ordersQuery, (snapshot) => {
       orderList.innerHTML = "";
