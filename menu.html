@@ -94,6 +94,16 @@ const coffees = [
 
 let customerName = null;
 
+// Controleer bij het laden of naam al opgeslagen is
+window.onload = function() {
+  const storedName = localStorage.getItem("customerName");
+  if (storedName) {
+    customerName = storedName;
+    document.getElementById("name-container").style.display = "none";
+    document.getElementById("menu-container").style.display = "block";
+  }
+};
+
 // Functie om naam op te slaan
 window.submitName = function() {
   const nameInput = document.getElementById("customer-name").value.trim();
@@ -101,16 +111,16 @@ window.submitName = function() {
     alert("Vul je naam in 😃");
     return;
   }
+
   customerName = nameInput;
+  // Sla naam op in localStorage
+  localStorage.setItem("customerName", customerName);
 
   // Toon menu en verberg naamveld
   document.getElementById("name-container").style.display = "none";
   document.getElementById("menu-container").style.display = "block";
 };
 
-let selectedCoffee = null;
-
-const menuDiv = document.getElementById("menu");
 
 // Extra opties container
 const optionsDiv = document.createElement("div");
@@ -147,6 +157,7 @@ coffees.forEach(coffee => {
   menuDiv.appendChild(div);
 });
 
+// Functie om bestelling te plaatsen
 window.placeOrder = function() {
   if (!customerName) {
     alert("Vul eerst je naam in!");
