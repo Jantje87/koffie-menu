@@ -227,13 +227,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- Naam opslaan en menu tonen ---
-document.getElementById("name-next-btn").addEventListener("click", () => {
+document.getElementById("name-next-btn").onclick = () => {
   const nameInput = document.getElementById("customer-name").value.trim();
   if (!nameInput) { alert("Vul je naam in 😃"); return; }
   customerName = nameInput;
   localStorage.setItem("customerName", customerName);
-  nameContainer.style.display = "none";
-  menuContainer.style.display = "block";
+  document.getElementById("name-screen").style.display = "none";
+  document.getElementById("menu-screen").style.display = "block";
   initMenu();
 });
 
