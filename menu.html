@@ -39,7 +39,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
   databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen"
+  projectId: "koffie-bestellen",
 };
 
 const app = initializeApp(firebaseConfig);
@@ -142,7 +142,7 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
 });
 
 // Bestelling plaatsen
-document.getElementById("order-btn").addEventListener("click", () => {
+document.getElementById("order-btn").addEventListener("click", placeOrder) => {
   if (!customerName) {
     alert("Vul eerst je naam in!");
     return;
