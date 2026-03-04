@@ -187,7 +187,7 @@
       { name: "Espresso", img: "espresso.jpg" },
       { name: "Long Black", img: "longblack.jpg" },
       { name: "Latte Macchiato", img: "latte.jpg" },
-      { name: "Latte Macchiato Pumpkin Spice", img: "pumpkin.jpg" },
+      { name: "Latte Macchiato Pumpkin Spice", img: "pumpkinspice.jpg" },
       { name: "Latte Macchiato Vanille", img: "vanille.jpg" },
       { name: "Latte Macchiato Caramel", img: "caramel.jpg" },
 	  { name: "Ijskoffie", img: "ijskoffie.jpg" },
@@ -196,21 +196,29 @@
 
     let selectedCoffee = null;
 
-    function initMenu() {
-      const menuDiv = document.getElementById("menu-screen");
-      menuDiv.innerHTML = "";
-      selectedCoffee = null;
+     function initMenu() {
+  const menuDiv = document.getElementById("menu-screen");
+  menuDiv.innerHTML = "";  // Maak het menu leeg
 
-      coffees.forEach(coffee => {
+  selectedCoffee = null;
+
+  // Haal de producten uit Firebase
+  const productsRef = ref(db, "products");
+  onValue(productsRef, (snapshot) => {
+    snapshot.forEach((childSnapshot) => {
+      const product = childSnapshot.val();
+
+      // Alleen beschikbare producten weergeven
+      if (product.available) {
         const div = document.createElement("div");
         div.className = "card";
 
         const img = document.createElement("img");
-        img.src = coffee.img;
+        img.src = product.img;  // Voeg afbeelding toe
         div.appendChild(img);
 
         const span = document.createElement("span");
-        span.textContent = coffee.name;
+        span.textContent = product.name;  // Voeg productnaam toe
         div.appendChild(span);
 
         div.onclick = () => {
@@ -221,13 +229,15 @@
           });
 
           div.classList.add("selected");
-          selectedCoffee = coffee.name;
-          showOptions(div, coffee.name);
+          selectedCoffee = product.name;
+          showOptions(div, product.name);
         };
 
-        menuDiv.appendChild(div);
-      });
-    }
+        menuDiv.appendChild(div);  // Voeg het product toe aan het menu
+      }
+    });
+  });
+}
 
     function showOptions(cardElement, coffeeName) {
       const optionsDiv = document.createElement("div");
