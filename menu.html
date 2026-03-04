@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
   <meta charset="UTF-8">
   <title>Koffie Menu</title>
@@ -20,7 +19,7 @@
       background: white;
       padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     }
 
     #name-screen input {
@@ -40,18 +39,18 @@
       cursor: pointer;
       background: linear-gradient(135deg, #6d4c41, #8d6e63);
       color: white;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
       transition: all 0.25s ease;
     }
 
     #name-screen button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
     #name-screen button:active {
       transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
     /* Menu scherm */
@@ -68,7 +67,7 @@
       border-radius: 15px;
       padding: 15px;
       margin-bottom: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: 0.2s;
       position: relative;
@@ -136,19 +135,19 @@
       cursor: pointer;
       background: linear-gradient(135deg, #6d4c41, #8d6e63);
       color: white;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
       transition: all 0.25s ease;
       margin-top: 15px;
     }
 
     #order-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
     #order-btn:active {
       transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
     /* Mobiel */
@@ -164,28 +163,26 @@
       }
     }
   </style>
-
   <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    // Firebase config
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-      authDomain: "koffie-bestellen.firebaseapp.com",
-      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "koffie-bestellen",
-      storageBucket: "koffie-bestellen.firebasestorage.app",
-      messagingSenderId: "592791423506",
-      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+  authDomain: "koffie-bestellen.firebaseapp.com",
+  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "koffie-bestellen",
+  storageBucket: "koffie-bestellen.firebasestorage.app",
+  messagingSenderId: "592791423506",
+  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    let selectedCoffee = null;
-
-    // Coffees array for testing
+    // Coffies
     const coffees = [
       { name: "Espresso", img: "espresso.jpg" },
       { name: "Long Black", img: "longblack.jpg" },
@@ -193,64 +190,66 @@
       { name: "Latte Macchiato Pumpkin Spice", img: "pumpkinspice.jpg" },
       { name: "Latte Macchiato Vanille", img: "vanille.jpg" },
       { name: "Latte Macchiato Caramel", img: "caramel.jpg" },
-      { name: "Ijskoffie", img: "ijskoffie.jpg" },
-      { name: "Thee", img: "thee.jpg" }
+	  { name: "Ijskoffie", img: "ijskoffie.jpg" },
+	  { name: "Thee", img: "thee.jpg" }
     ];
 
-    // Initialize menu screen
-    function initMenu() {
-      const menuDiv = document.getElementById("menu-screen");
-      menuDiv.innerHTML = "";  // Clear the menu
+    let selectedCoffee = null;
 
-      selectedCoffee = null;
+     function initMenu() {
+  const menuDiv = document.getElementById("menu-screen");
+  menuDiv.innerHTML = "";  // Maak het menu leeg
 
-      // Fetch products from Firebase
-      const productsRef = ref(db, "products");
-      onValue(productsRef, (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-          const product = childSnapshot.val();
+  selectedCoffee = null;
 
-          // Only display available products
-          if (product.available) {
-            const div = document.createElement("div");
-            div.className = "card";
+  // Haal de producten uit Firebase
+  const productsRef = ref(db, "products");
+  onValue(productsRef, (snapshot) => {
+    snapshot.forEach((childSnapshot) => {
+      const product = childSnapshot.val();
 
-            const img = document.createElement("img");
-            img.src = product.img;  // Add image
-            div.appendChild(img);
+      // Alleen beschikbare producten weergeven
+      if (product.available) {
+        const div = document.createElement("div");
+        div.className = "card";
 
-            const span = document.createElement("span");
-            span.textContent = product.name;  // Add product name
-            div.appendChild(span);
+        const img = document.createElement("img");
+        img.src = product.img;  // Voeg afbeelding toe
+        div.appendChild(img);
 
-            div.onclick = () => {
-              document.querySelectorAll(".card").forEach(c => {
-                c.classList.remove("selected");
-                const oldOptions = c.querySelector(".card-options");
-                if (oldOptions) oldOptions.remove();
-              });
+        const span = document.createElement("span");
+        span.textContent = product.name;  // Voeg productnaam toe
+        div.appendChild(span);
 
-              div.classList.add("selected");
-              selectedCoffee = product.name;
-              showOptions(div, product.name);
-              showOrderButton();  // Show order button
-            };
+        div.onclick = () => {
+          document.querySelectorAll(".card").forEach(c => {
+            c.classList.remove("selected");
+            const oldOptions = c.querySelector(".card-options");
+            if (oldOptions) oldOptions.remove();
+          });
 
-            menuDiv.appendChild(div);  // Add product to menu
-          }
-        });
-      });
-    }
+          div.classList.add("selected");
+          selectedCoffee = product.name;
+          showOptions(div, product.name);
+		  
+		   // Maak de bestelknop zichtbaar wanneer een product wordt geselecteerd
+          showOrderButton();
+        };
 
-    // Function to show order button
-    function showOrderButton() {
-      const orderButton = document.getElementById("order-btn");
-      if (orderButton) {
-        orderButton.style.display = "block";  // Make the button visible
+        menuDiv.appendChild(div);  // Voeg het product toe aan het menu
       }
-    }
+    });
+  });
+}
 
-    // Show options for coffee (e.g., milk, sugar)
+// Functie om de bestelknop zichtbaar te maken
+function showOrderButton() {
+  const orderButton = document.getElementById("order-btn");
+  if (orderButton) {
+    orderButton.style.display = "block";  // Maak de knop zichtbaar
+  }
+}
+
     function showOptions(cardElement, coffeeName) {
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "card-options";
@@ -258,4 +257,91 @@
       const sugarIcon = `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5">
           <rect x="3" y="8" width="8" height="8" rx="2"/>
-          <rect x
+          <rect x="9" y="4" width="8" height="8" rx="2"/>
+          <rect x="13" y="10" width="8" height="8" rx="2"/>
+        </svg>
+      `;
+
+      if (coffeeName === "Espresso" || coffeeName === "Lungo") {
+        optionsDiv.innerHTML = `
+          <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
+          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+        `;
+      } else if (coffeeName.includes("Latte Macchiato")) {
+        optionsDiv.innerHTML = `
+          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+        `;
+      }
+
+      // Stop bubbelen zodat checkboxes werken
+      optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        cb.addEventListener("click", (e) => e.stopPropagation());
+      });
+
+      cardElement.appendChild(optionsDiv);
+
+      setTimeout(() => {
+        cardElement.classList.add("selected");
+      }, 10);
+    }
+
+    // Naam invoer scherm
+    document.getElementById("next-btn").onclick = () => {
+      const nameInput = document.getElementById("customer-name").value.trim();
+      if (!nameInput) {
+        alert("Vul eerst je naam in!");
+        return;
+      }
+      localStorage.setItem("customerName", nameInput);
+      document.getElementById("name-screen").style.display = "none";
+      document.getElementById("menu-screen").style.display = "block";
+      initMenu();
+    };
+
+    // Bestelknop
+    document.getElementById("order-btn").onclick = () => {
+      if (!selectedCoffee) {
+        alert("Selecteer eerst een koffie");
+        return;
+      }
+
+      const selectedCard = document.querySelector(".card.selected");
+      if (!selectedCard) return;
+
+      const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
+      const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
+
+      const order = {
+        name: localStorage.getItem("customerName"),
+        coffee: selectedCoffee,
+        milk: milk,
+        sugar: sugar,
+        time: new Date().toLocaleTimeString()
+      };
+
+      push(ref(db, "orders"), order);
+      alert("Bestelling geplaatst! ✅");
+	  
+	    // Verberg de bestelknop na het plaatsen van de bestelling
+  const orderButton = document.getElementById("order-btn");
+  if (orderButton) {
+    orderButton.style.display = "none";  // Verberg de knop
+  }
+    };
+  </script>
+</head>
+<body>
+  <!-- Naam scherm -->
+  <div id="name-screen">
+    <h2>Vul je naam in</h2>
+    <input type="text" id="customer-name" placeholder="Naam">
+    <button id="next-btn">Volgende</button>
+  </div>
+
+  <!-- Menu scherm -->
+  <div id="menu-screen" style="display:none;">
+    <!-- Menu wordt hier dynamisch geladen -->
+    <<button id="order-btn" style="display:none;">☕ Bestelling plaatsen</button>
+  </div>
+</body>
+</html>
