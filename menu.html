@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Koffie Menu</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f2f2f2;
       margin: 0;
-      padding: 0 15px;
+      padding: 0;
     }
 
     /* Naam scherm */
@@ -19,7 +21,7 @@
       background: white;
       padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     }
 
     #name-screen input {
@@ -39,18 +41,18 @@
       cursor: pointer;
       background: linear-gradient(135deg, #6d4c41, #8d6e63);
       color: white;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
       transition: all 0.25s ease;
     }
 
     #name-screen button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     }
 
     #name-screen button:active {
       transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
 
     /* Menu scherm */
@@ -61,13 +63,14 @@
 
     .card {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 20px;
       background: white;
       border-radius: 15px;
       padding: 15px;
       margin-bottom: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       cursor: pointer;
       transition: 0.2s;
       position: relative;
@@ -86,7 +89,6 @@
     }
 
     .card span {
-      flex: 1;
       text-align: center;
       font-size: 18px;
       font-weight: 600;
@@ -135,54 +137,71 @@
       cursor: pointer;
       background: linear-gradient(135deg, #6d4c41, #8d6e63);
       color: white;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
       transition: all 0.25s ease;
       margin-top: 15px;
     }
 
     #order-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     }
 
     #order-btn:active {
       transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
 
-    /* Mobiel */
+    /* Responsive design for mobile */
     @media (max-width: 600px) {
       .card {
         flex-direction: column;
         text-align: center;
+        padding: 10px;
       }
 
       .card img {
         width: 100%;
-        height: 160px;
+        height: auto;
+        max-width: 150px;
+      }
+
+      #name-screen {
+        width: 90%;
+        margin: 20px auto;
+      }
+
+      #menu-screen {
+        padding: 10px;
+      }
+
+      #order-btn {
+        font-size: 16px;
       }
     }
   </style>
+
   <!-- Firebase -->
   <script type="module">
-    // Firebase config
- import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-  authDomain: "koffie-bestellen.firebaseapp.com",
-  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen",
-  storageBucket: "koffie-bestellen.firebasestorage.app",
-  messagingSenderId: "592791423506",
-  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+      authDomain: "koffie-bestellen.firebaseapp.com",
+      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "koffie-bestellen",
+      storageBucket: "koffie-bestellen.firebasestorage.app",
+      messagingSenderId: "592791423506",
+      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Coffies
+    let selectedCoffee = null;
+
+    // Coffees array for testing
     const coffees = [
       { name: "Espresso", img: "espresso.jpg" },
       { name: "Long Black", img: "longblack.jpg" },
@@ -190,66 +209,64 @@
       { name: "Latte Macchiato Pumpkin Spice", img: "pumpkinspice.jpg" },
       { name: "Latte Macchiato Vanille", img: "vanille.jpg" },
       { name: "Latte Macchiato Caramel", img: "caramel.jpg" },
-	  { name: "Ijskoffie", img: "ijskoffie.jpg" },
-	  { name: "Thee", img: "thee.jpg" }
+      { name: "Ijskoffie", img: "ijskoffie.jpg" },
+      { name: "Thee", img: "thee.jpg" }
     ];
 
-    let selectedCoffee = null;
+    // Initialize menu screen
+    function initMenu() {
+      const menuDiv = document.getElementById("menu-screen");
+      menuDiv.innerHTML = "";  // Clear the menu
 
-     function initMenu() {
-  const menuDiv = document.getElementById("menu-screen");
-  menuDiv.innerHTML = "";  // Maak het menu leeg
+      selectedCoffee = null;
 
-  selectedCoffee = null;
+      // Fetch products from Firebase
+      const productsRef = ref(db, "products");
+      onValue(productsRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const product = childSnapshot.val();
 
-  // Haal de producten uit Firebase
-  const productsRef = ref(db, "products");
-  onValue(productsRef, (snapshot) => {
-    snapshot.forEach((childSnapshot) => {
-      const product = childSnapshot.val();
+          // Only display available products
+          if (product.available) {
+            const div = document.createElement("div");
+            div.className = "card";
 
-      // Alleen beschikbare producten weergeven
-      if (product.available) {
-        const div = document.createElement("div");
-        div.className = "card";
+            const img = document.createElement("img");
+            img.src = product.img;  // Add image
+            div.appendChild(img);
 
-        const img = document.createElement("img");
-        img.src = product.img;  // Voeg afbeelding toe
-        div.appendChild(img);
+            const span = document.createElement("span");
+            span.textContent = product.name;  // Add product name
+            div.appendChild(span);
 
-        const span = document.createElement("span");
-        span.textContent = product.name;  // Voeg productnaam toe
-        div.appendChild(span);
+            div.onclick = () => {
+              document.querySelectorAll(".card").forEach(c => {
+                c.classList.remove("selected");
+                const oldOptions = c.querySelector(".card-options");
+                if (oldOptions) oldOptions.remove();
+              });
 
-        div.onclick = () => {
-          document.querySelectorAll(".card").forEach(c => {
-            c.classList.remove("selected");
-            const oldOptions = c.querySelector(".card-options");
-            if (oldOptions) oldOptions.remove();
-          });
+              div.classList.add("selected");
+              selectedCoffee = product.name;
+              showOptions(div, product.name);
+              showOrderButton();  // Show order button
+            };
 
-          div.classList.add("selected");
-          selectedCoffee = product.name;
-          showOptions(div, product.name);
-		  
-		   // Maak de bestelknop zichtbaar wanneer een product wordt geselecteerd
-          showOrderButton();
-        };
+            menuDiv.appendChild(div);  // Add product to menu
+          }
+        });
+      });
+    }
 
-        menuDiv.appendChild(div);  // Voeg het product toe aan het menu
+    // Function to show order button
+    function showOrderButton() {
+      const orderButton = document.getElementById("order-btn");
+      if (orderButton) {
+        orderButton.style.display = "block";  // Make the button visible
       }
-    });
-  });
-}
+    }
 
-// Functie om de bestelknop zichtbaar te maken
-function showOrderButton() {
-  const orderButton = document.getElementById("order-btn");
-  if (orderButton) {
-    orderButton.style.display = "block";  // Maak de knop zichtbaar
-  }
-}
-
+    // Show options for coffee (e.g., milk, sugar)
     function showOptions(cardElement, coffeeName) {
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "card-options";
@@ -322,14 +339,15 @@ function showOrderButton() {
       push(ref(db, "orders"), order);
       alert("Bestelling geplaatst! ✅");
 	  
-	    // Verberg de bestelknop na het plaatsen van de bestelling
-  const orderButton = document.getElementById("order-btn");
-  if (orderButton) {
-    orderButton.style.display = "none";  // Verberg de knop
-  }
+      // Verberg de bestelknop na het plaatsen van de bestelling
+      const orderButton = document.getElementById("order-btn");
+      if (orderButton) {
+        orderButton.style.display = "none";  // Verberg de knop
+      }
     };
   </script>
 </head>
+
 <body>
   <!-- Naam scherm -->
   <div id="name-screen">
@@ -341,7 +359,8 @@ function showOrderButton() {
   <!-- Menu scherm -->
   <div id="menu-screen" style="display:none;">
     <!-- Menu wordt hier dynamisch geladen -->
-    <<button id="order-btn" style="display:none;">☕ Bestelling plaatsen</button>
+    <button id="order-btn" style="display:none;">☕ Bestelling plaatsen</button>
   </div>
 </body>
+
 </html>
