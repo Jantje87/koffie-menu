@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -119,14 +119,14 @@
       });
     });
 
-    // Realtime bestellingen ophalen
+    // Realtime bestellingen ophalen (met omgekeerde volgorde)
     const ordersRef = ref(db, "orders");
     const orderList = document.getElementById("order-list");
 
-// Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
+    // Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
     const ordersQuery = query(ordersRef, orderByKey());
 
-    onValue(ordersRef, (snapshot) => {
+    onValue(ordersQuery, (snapshot) => {
       orderList.innerHTML = "";
       snapshot.forEach(childSnapshot => {
         const order = childSnapshot.val();
