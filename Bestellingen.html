@@ -120,8 +120,8 @@
     });
 
     // Realtime bestellingen ophalen (met omgekeerde volgorde)
-    const ordersRef = ref(db, "orders");
-    const orderList = document.getElementById("order-list");
+const ordersRef = ref(db, "orders");
+const orderList = document.getElementById("order-list");
 
     // Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
     const ordersQuery = query(ordersRef, orderByChild('timestamp'));
