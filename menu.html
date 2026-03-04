@@ -143,6 +143,8 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
 
 // Bestelling plaatsen
 window.placeOrder = function() {
+  console.log("Plaats bestelling:", customerName, selectedCoffee);
+  
   if (!customerName) {
     alert("Vul eerst je naam in!");
     return;
@@ -150,10 +152,9 @@ window.placeOrder = function() {
   if (!selectedCoffee) {
     alert("Kies eerst een koffie ☕");
     return;
-  }
+  };
 
-  const milk = document.getElementById("milk")?.checked || false;
-  const sugar = document.getElementById("sugar")?.checked || false;
+  
 
   push(ref(db, "orders"), {
     name: customerName,
