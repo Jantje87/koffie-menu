@@ -56,24 +56,6 @@ h1,h2 { text-align:center; color:#3e2723; }
   font-size: 15px;
 }
 
-/* Opties verborgen standaard */
-.card-options {
-  max-height: 0;                  /* Verbergen */
-  overflow: hidden;               /* Zorgt ervoor dat het niet zichtbaar is */
-  padding-top: 0;
-  border-top: 1px solid #eee;
-  transition: max-height 0.5s ease-out, padding-top 0.5s ease-out;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Wanneer de opties zichtbaar zijn */
-.card.selected .card-options {
-  max-height: 200px;              /* Ruimte voor de opties */
-  padding-top: 10px;
-}
-
 .selected {
   border: 3px solid #6d4c41;
 }
@@ -192,7 +174,6 @@ function initMenu() {
         if (oldOptions) oldOptions.remove();
       });
 
-      // Voeg geselecteerde class toe en show opties
       div.classList.add("selected");
       selectedCoffee = coffee.name;
 
@@ -209,12 +190,15 @@ function showOptions(cardElement, coffeeName) {
   optionsDiv.className = "card-options";
 
   const sugarIcon = `
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="#6d4c41">
-      <rect x="3" y="8" width="8" height="8" rx="2"/>
-      <rect x="9" y="4" width="8" height="8" rx="2"/>
-      <rect x="13" y="10" width="8" height="8" rx="2"/>
-    </svg>
-  `;
+  <svg width="22" height="22" viewBox="0 0 24 24">
+    <rect x="3" y="8" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+    <rect x="9" y="4" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+    <rect x="13" y="10" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+  </svg>
+`;
 
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
     optionsDiv.innerHTML = `
@@ -228,11 +212,6 @@ function showOptions(cardElement, coffeeName) {
   }
 
   cardElement.appendChild(optionsDiv);
-
-  // Voeg de 'show' animatie toe
-  setTimeout(() => {
-    cardElement.classList.add("selected");
-  }, 10);  // Kleine vertraging voor animatie
 }
 
 // --- Check of naam al is opgeslagen ---
