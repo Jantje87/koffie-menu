@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -60,22 +60,30 @@
       text-align: center;
       color: #6d4c41;
     }
+
+    .order-btn {
+      background: #4CAF50;  /* Groen voor Voltooid */
+    }
+
+    .order-btn:hover {
+      background: #45a049;
+    }
   </style>
 
   <!-- Firebase config en import -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     // Firebase configuratie
     const firebaseConfig = {
        apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-  authDomain: "koffie-bestellen.firebaseapp.com",
-  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen",
-  storageBucket: "koffie-bestellen.firebasestorage.app",
-  messagingSenderId: "592791423506",
-  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+       authDomain: "koffie-bestellen.firebaseapp.com",
+       databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+       projectId: "koffie-bestellen",
+       storageBucket: "koffie-bestellen.firebasestorage.app",
+       messagingSenderId: "592791423506",
+       appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -133,6 +141,17 @@
         orderDetailDiv.textContent = `Melk: ${order.milk ? "Ja" : "Nee"}, Suiker: ${order.sugar ? "Ja" : "Nee"}`;
         orderDiv.appendChild(orderDetailDiv);
 
+        // Knop om bestelling als voltooid te markeren
+        const completeButton = document.createElement("button");
+        completeButton.className = "toggle-btn order-btn";
+        completeButton.textContent = order.completed ? "Voltooid" : "Markeer als Voltooid";
+        completeButton.onclick = () => {
+          // Update de status van de bestelling naar 'voltooid'
+          update(ref(db, `orders/${orderKey}`), { completed: true });
+        };
+
+        // Voeg de knop toe aan de bestelling
+        orderDiv.appendChild(completeButton);
         orderList.appendChild(orderDiv);
       });
     });
