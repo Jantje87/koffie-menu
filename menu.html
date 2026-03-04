@@ -59,6 +59,34 @@
     #menu-screen {
       max-width: 600px;
       margin: 20px auto;
+      padding-top: 20px;
+    }
+
+    /* Bestelknop bovenaan het scherm */
+    #order-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6d4c41, #8d6e63);
+      color: white;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.25s ease;
+      margin-bottom: 20px; /* Ruimte tussen de knop en de producten */
+      display: none; /* Standaard de bestelknop verbergen */
+    }
+
+    #order-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    #order-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
 
     .card {
@@ -94,7 +122,6 @@
       font-weight: 600;
     }
 
-    /* Opties onder de kaart */
     .card-options {
       max-height: 0;
       overflow: hidden;
@@ -120,40 +147,12 @@
       cursor: pointer;
     }
 
-    /* Checkboxes iets groter */
     .card-options input[type="checkbox"] {
       width: 18px;
       height: 18px;
     }
 
-    /* Bestelknop */
-    #order-btn {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: 600;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #6d4c41, #8d6e63);
-      color: white;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-      transition: all 0.25s ease;
-      margin-top: 15px;
-	  display: none; /* Standaard de bestelknop verbergen */
-    }
-
-    #order-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    #order-btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Responsive design for mobile */
+    /* Responsive design voor mobiel */
     @media (max-width: 600px) {
       .card {
         flex-direction: column;
@@ -339,10 +338,10 @@
     <button id="next-btn">Volgende</button>
   </div>
 
-  <!-- Menu scherm -->
+    <!-- Menu scherm -->
   <div id="menu-screen" style="display:none;">
+    <button id="order-btn">☕ Bestelling plaatsen</button>
     <!-- Menu wordt hier dynamisch geladen -->
-    <button id="order-btn" style="display:none;">☕ Bestelling plaatsen</button>
   </div>
 </body>
 
