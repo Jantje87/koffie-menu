@@ -13,7 +13,7 @@ body {
   padding: 20px;
 }
 
-h1 {
+h1, h2 {
   text-align: center;
   color: #3e2723;
 }
@@ -51,6 +51,11 @@ button {
   font-size: 16px;
   margin-top: 15px;
 }
+#options label {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+}
 </style>
 </head>
 
@@ -65,7 +70,7 @@ button {
 <div id="menu-container" style="display:none;">
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
-  <div id="options" style="margin-top:15px;"></div>
+  <div id="options"></div>
   <button onclick="placeOrder()">Bestelling bevestigen</button>
 </div>
 
@@ -93,46 +98,74 @@ const coffees = [
 ];
 
 let customerName = null;
+let selectedCoffee = null;
 
-// Controleer bij het laden of naam al opgeslagen is
+const coffees = [
+  "Espresso",
+  "Long Black",
+  "Latte Macchiato",
+  "Latte Macchiato + Pumpkin Spice",
+  "Latte Macchiato + Vanille",
+  "Latte Macchiato + Caramel"
+];
+
+const menuDiv = document.getElementById("menu");
+const optionsDiv = document.getElementById("options");
+
+// Check of naam al is opgeslagen
 window.onload = function() {
   const storedName = localStorage.getItem("customerName");
   if (storedName) {
     customerName = storedName;
     document.getElementById("name-container").style.display = "none";
     document.getElementById("menu-container").style.display = "block";
+    initMenu();
   }
 };
 
-// Functie om naam op te slaan
+// Functie om naam op te slaan en menu te tonen
 window.submitName = function() {
   const nameInput = document.getElementById("customer-name").value.trim();
   if (!nameInput) {
     alert("Vul je naam in 😃");
     return;
   }
-
   customerName = nameInput;
-  // Sla naam op in localStorage
   localStorage.setItem("customerName", customerName);
-
-  // Toon menu en verberg naamveld
   document.getElementById("name-container").style.display = "none";
   document.getElementById("menu-container").style.display = "block";
+  initMenu();
 };
 
+// Functie om het menu en de opties te initialiseren
+function initMenu() {
+  menuDiv.innerHTML = "";
+  selectedCoffee = null;
+  optionsDiv.innerHTML = "";
 
-// Extra opties container
-const optionsDiv = document.createElement("div");
-optionsDiv.style.marginTop = "15px";
-menuDiv.after(optionsDiv);
+  coffees.forEach(coffee => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerText = coffee;
 
+    div.onclick = () => {
+      document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+      div.classList.add("selected");
+      selectedCoffee = coffee;
+      showOptions(coffee);
+    };
+
+    menuDiv.appendChild(div);
+  });
+}
+
+// Toon melk/suiker opties afhankelijk van koffie
 function showOptions(coffee) {
   optionsDiv.innerHTML = "";
 
   if (coffee === "Espresso" || coffee === "Long Black") {
     optionsDiv.innerHTML += `
-      <label><input type="checkbox" id="milk"> Melk</label><br>
+      <label><input type="checkbox" id="milk"> Melk</label>
       <label><input type="checkbox" id="sugar"> Suiker</label>
     `;
   } else if (coffee.includes("Latte")) {
@@ -142,28 +175,12 @@ function showOptions(coffee) {
   }
 }
 
-coffees.forEach(coffee => {
-  const div = document.createElement("div");
-  div.className = "card";
-  div.innerText = coffee;
-
-  div.onclick = () => {
-    document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
-    div.classList.add("selected");
-    selectedCoffee = coffee;
-    showOptions(coffee);
-  };
-
-  menuDiv.appendChild(div);
-});
-
-// Functie om bestelling te plaatsen
+// Bestelling plaatsen
 window.placeOrder = function() {
   if (!customerName) {
     alert("Vul eerst je naam in!");
     return;
   }
-
   if (!selectedCoffee) {
     alert("Kies eerst een koffie ☕");
     return;
@@ -185,3 +202,5 @@ window.placeOrder = function() {
   location.reload();
 };
 </script>
+</body>
+</html>
