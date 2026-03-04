@@ -49,12 +49,13 @@ let customerName = null;
 let selectedCoffee = null;
 
 const coffees = [
-  "Espresso",
-  "Long Black",
-  "Latte Macchiato",
-  "Latte Macchiato + Pumpkin Spice",
-  "Latte Macchiato + Vanille",
-  "Latte Macchiato + Caramel"
+  { name: "Espresso", img: "espresso.jpg" },
+  { name: "Long Black", img: "longblack.jpg" },
+  { name: "Latte Macchiato", img: "lattemacchiato.jpg" },
+  { name: "Latte Macchiato + Pumpkin Spice", img: "pumpkinspice.jpg" },
+  { name: "Latte Macchiato + Vanille", img: "vanille.jpg" },
+  { name: "Latte Macchiato + Caramel", img: "caramel.jpg" }
+];
 ];
 
 const menuDiv = document.getElementById("menu");
@@ -71,13 +72,29 @@ function initMenu() {
   coffees.forEach(coffee => {
     const div = document.createElement("div");
     div.className = "card";
-    div.textContent = coffee;
 
+    // Voeg afbeelding toe
+    const img = document.createElement("img");
+    img.src = coffee.img; // gebruik pad of URL
+    img.style.width = "100%";
+	img.style.height = "150px";   // hier voeg je de hoogte toe
+	img.style.objectFit = "cover"; // voor mooie bijsnijding
+    img.style.borderRadius = "10px";
+    img.style.marginBottom = "10px";
+
+    div.appendChild(img);
+
+    // Voeg koffie naam toe
+    const span = document.createElement("span");
+    span.textContent = coffee.name;
+    div.appendChild(span);
+
+    // Klik selectie
     div.onclick = () => {
       document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
       div.classList.add("selected");
-      selectedCoffee = coffee;
-      showOptions(coffee);
+      selectedCoffee = coffee.name;
+      showOptions(coffee.name);
     };
 
     menuDiv.appendChild(div);
