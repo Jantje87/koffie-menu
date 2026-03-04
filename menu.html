@@ -201,19 +201,20 @@ function showOptions(cardElement, coffeeName) {
 `;
 
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
-    optionsDiv.innerHTML = `
-      <label><input type="checkbox" id="milk"> 🥛 Melk</label>
-      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
-    `;
-  } else if (coffeeName.includes("Latte")) {
-    optionsDiv.innerHTML = `
-      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
-    `;
-  }
-
-  cardElement.appendChild(optionsDiv);
+  optionsDiv.innerHTML = `
+    <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
+    <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+  `;
+} else if (coffeeName.includes("Latte")) {
+  optionsDiv.innerHTML = `
+    <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+  `;
 }
 
+// Stop click event op checkboxes van “bubbelen” naar de kaart
+optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
+  cb.addEventListener("click", (e) => e.stopPropagation());
+});
 // --- Check of naam al is opgeslagen ---
 window.addEventListener("DOMContentLoaded", () => {
   const storedName = localStorage.getItem("customerName");
