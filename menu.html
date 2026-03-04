@@ -307,7 +307,7 @@
         coffee: coffeeName,
         milk: milk,
         sugar: sugar,
-        time: new Date().toLocaleTimeString()
+        time: Date.now()
       };
 
       push(ref(db, "orders"), order);
