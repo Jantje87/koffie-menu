@@ -88,6 +88,26 @@ let selectedCoffee = null;
 
 const menuDiv = document.getElementById("menu");
 
+// Extra opties container
+const optionsDiv = document.createElement("div");
+optionsDiv.style.marginTop = "15px";
+menuDiv.after(optionsDiv);
+
+function showOptions(coffee) {
+  optionsDiv.innerHTML = "";
+
+  if (coffee === "Espresso" || coffee === "Long Black") {
+    optionsDiv.innerHTML += `
+      <label><input type="checkbox" id="milk"> Melk</label><br>
+      <label><input type="checkbox" id="sugar"> Suiker</label>
+    `;
+  } else if (coffee.includes("Latte")) {
+    optionsDiv.innerHTML += `
+      <label><input type="checkbox" id="sugar"> Suiker</label>
+    `;
+  }
+}
+
 coffees.forEach(coffee => {
   const div = document.createElement("div");
   div.className = "card";
@@ -97,6 +117,7 @@ coffees.forEach(coffee => {
     document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
     div.classList.add("selected");
     selectedCoffee = coffee;
+    showOptions(coffee);
   };
 
   menuDiv.appendChild(div);
@@ -108,17 +129,18 @@ window.placeOrder = function() {
     return;
   }
 
+  const milk = document.getElementById("milk")?.checked || false;
+  const sugar = document.getElementById("sugar")?.checked || false;
+
   push(ref(db, "orders"), {
     coffee: selectedCoffee,
+    milk: milk,
+    sugar: sugar,
     time: new Date().toLocaleTimeString(),
     status: "nieuw"
   });
 
   alert("Bestelling geplaatst!");
-  selectedCoffee = null;
-  document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+  location.reload();
 }
 </script>
-
-</body>
-</html>
