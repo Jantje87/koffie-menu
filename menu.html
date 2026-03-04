@@ -29,7 +29,6 @@ button { width:100%; padding:15px; background:#6d4c41; color:white; border:none;
   <div class="container" id="menu"></div>
   <div id="options"></div>
   <button id="order-btn">Bestelling bevestigen</button>
-  <button id="change-name-btn" style="margin-top:10px; background:#a1887f;">Andere naam invullen</button>
 </div>
 
 <script type="module">
@@ -130,10 +129,10 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
 });
 
 // --- Naam wijzigen ---
-document.getElementById("change-name-btn").addEventListener("click", () => {
-  localStorage.removeItem("customerName");
-  location.reload();
-});
+// document.getElementById("change-name-btn").addEventListener("click", () => {
+//  localStorage.removeItem("customerName");
+//  location.reload();
+// });
 
 // --- Bestelling plaatsen ---
 document.getElementById("order-btn").addEventListener("click", () => {
