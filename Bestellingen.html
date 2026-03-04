@@ -1,149 +1,162 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bestellingen Overzicht</title>
-<style>
-body { font-family: Arial, sans-serif; background:#f5f3ef; padding:20px; }
-h1 { text-align:center; color:#3e2723; }
-.order-card {
-  background:white;
-  border-radius:15px;
-  padding:15px;
-  margin-bottom:15px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-.order-card {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  background: white;
-  border-radius: 15px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+  <meta charset="UTF-8">
+  <title>Admin - Bestellingen en Producten</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
 
-.order-card img {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-  flex-shrink: 0;
-}
+    h1 {
+      text-align: center;
+      color: #6d4c41;
+    }
 
-.order-info {
-  flex: 1;
-}
+    .product-list, .order-list {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
 
-.order-info p {
-  margin: 4px 0;
-}
+    .product, .order {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
 
-button {
-  padding: 8px 12px;
-  background: #6d4c41;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 10px;
-}
+    .order span, .product span {
+      font-size: 16px;
+    }
 
-/* 📱 Mobiel: onder elkaar */
-@media (max-width: 600px) {
-  .order-card {
-    flex-direction: column;
-  }
+    .toggle-btn {
+      padding: 8px 16px;
+      background: #6d4c41;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-  .order-card img {
-    width: 100%;
-    height: 180px;
-  }
-}
-</style>
-</head>
-<body>
+    .toggle-btn:hover {
+      background: #8d6e63;
+    }
 
-<h1>☕ Bestellingen</h1>
-<h2 id="order-count">Open bestellingen: 0</h2>
-<div id="orders"></div>
+    .order-detail {
+      font-size: 14px;
+      color: #555;
+    }
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    .order-list h2, .product-list h2 {
+      text-align: center;
+      color: #6d4c41;
+    }
+  </style>
 
-// 🔹 Firebase config (jouw gegevens invullen)
-const firebaseConfig = {
-  apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+  <!-- Firebase config en import -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // Firebase configuratie
+    const firebaseConfig = {
+       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
   databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const ordersRef = ref(db, "orders");
-
-// 🔹 Afbeeldingen koppelen aan koffienaam
-const coffeeImages = {
-  "Espresso": "espresso.jpg",
-  "Long Black": "longblack.jpg",
-  "Latte Macchiato": "lattemacchiato.jpg",
-  "Latte Macchiato + Pumpkin Spice": "pumpkinspice.jpg",
-  "Latte Macchiato + Vanille": "vanille.jpg",
-  "Latte Macchiato + Caramel": "caramel.jpg"
-};
-
-// 🔹 Bestellingen realtime ophalen
-onValue(ordersRef, (snapshot) => {
-  const ordersDiv = document.getElementById("orders");
-  const countDiv = document.getElementById("order-count");
-
-  ordersDiv.innerHTML = "";
-
-  let orderCount = 0;
-
-  snapshot.forEach((childSnapshot) => {
-    orderCount++;
-
-    const order = childSnapshot.val();
-    const key = childSnapshot.key;
-
-    const div = document.createElement("div");
-    div.className = "order-card";
-
-    const img = document.createElement("img");
-    img.src = coffeeImages[order.coffee] || "espresso.jpg";
-    div.appendChild(img);
-
-    const infoDiv = document.createElement("div");
-    infoDiv.className = "order-info";
-
-    infoDiv.innerHTML = `
-      <p><strong>Naam:</strong> ${order.name}</p>
-      <p><strong>Koffie:</strong> ${order.coffee}</p>
-      <p><strong>Melk:</strong> ${order.milk ? "Ja" : "Nee"}</p>
-      <p><strong>Suiker:</strong> ${order.sugar ? "Ja" : "Nee"}</p>
-      <p><strong>Tijd:</strong> ${order.time}</p>
-    `;
-
-    const doneButton = document.createElement("button");
-    doneButton.textContent = "Bestelling afronden";
-    doneButton.onclick = () => {
-      remove(ref(db, "orders/" + key));
+  projectId: "koffie-bestellen",
+  storageBucket: "koffie-bestellen.firebasestorage.app",
+  messagingSenderId: "592791423506",
+  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
     };
 
-    infoDiv.appendChild(doneButton);
-    div.appendChild(infoDiv);
-    ordersDiv.appendChild(div);
-  });
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  // 🔢 Update teller
-  countDiv.textContent = `Open bestellingen: ${orderCount}`;
-});
-</script>
+    // Realtime producten beheren
+    const productsRef = ref(db, "products");
+    const productList = document.getElementById("product-list");
+
+    onValue(productsRef, (snapshot) => {
+      productList.innerHTML = "";
+      snapshot.forEach(childSnapshot => {
+        const product = childSnapshot.val();
+        const productKey = childSnapshot.key;
+
+        const productDiv = document.createElement("div");
+        productDiv.className = "product";
+
+        const productName = document.createElement("span");
+        productName.textContent = product.name;
+        productDiv.appendChild(productName);
+
+        const toggleButton = document.createElement("button");
+        toggleButton.className = "toggle-btn";
+        toggleButton.textContent = product.available ? "Verwijder" : "Herstel";
+        toggleButton.onclick = () => {
+          const available = !product.available;
+          update(ref(db, `products/${productKey}`), { available });
+        };
+
+        productDiv.appendChild(toggleButton);
+        productList.appendChild(productDiv);
+      });
+    });
+
+    // Realtime bestellingen ophalen
+    const ordersRef = ref(db, "orders");
+    const orderList = document.getElementById("order-list");
+
+    onValue(ordersRef, (snapshot) => {
+      orderList.innerHTML = "";
+      snapshot.forEach(childSnapshot => {
+        const order = childSnapshot.val();
+        const orderKey = childSnapshot.key;
+
+        const orderDiv = document.createElement("div");
+        orderDiv.className = "order";
+
+        const orderDetails = document.createElement("span");
+        orderDetails.textContent = `${order.name} bestelde een ${order.coffee} om ${order.time}`;
+        orderDiv.appendChild(orderDetails);
+
+        const orderDetailDiv = document.createElement("div");
+        orderDetailDiv.className = "order-detail";
+        orderDetailDiv.textContent = `Melk: ${order.milk ? "Ja" : "Nee"}, Suiker: ${order.sugar ? "Ja" : "Nee"}`;
+        orderDiv.appendChild(orderDetailDiv);
+
+        orderList.appendChild(orderDiv);
+      });
+    });
+
+  </script>
+</head>
+<body>
+  <h1>Admin Paneel</h1>
+
+  <!-- Producten beheren -->
+  <div class="product-list">
+    <h2>Producten</h2>
+    <div id="product-list">
+      <!-- Producten worden hier geladen -->
+    </div>
+  </div>
+
+  <!-- Bestellingen bekijken -->
+  <div class="order-list">
+    <h2>Bestellingen</h2>
+    <div id="order-list">
+      <!-- Bestellingen worden hier geladen -->
+    </div>
+  </div>
 
 </body>
 </html>
