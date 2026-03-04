@@ -40,6 +40,22 @@ h1,h2 { text-align:center; color:#3e2723; }
   font-weight: 600;
 }
 
+.card-options {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
 .selected {
   border: 3px solid #6d4c41;
 }
@@ -96,7 +112,6 @@ h1,h2 { text-align:center; color:#3e2723; }
 <div id="menu-container" style="display:none;">
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
-  <div id="options"></div>
   <button id="order-btn">☕ Bestelling plaatsen</button>
 </div>
 
@@ -138,14 +153,13 @@ const menuContainer = document.getElementById("menu-container");
 function initMenu() {
   menuDiv.innerHTML = "";
   selectedCoffee = null;
-  optionsDiv.innerHTML = "";
 
   coffees.forEach(coffee => {
     const div = document.createElement("div");
     div.className = "card";
 
     const img = document.createElement("img");
-    img.src = coffee.img; // of URL
+    img.src = coffee.img;
     div.appendChild(img);
 
     const span = document.createElement("span");
@@ -153,10 +167,17 @@ function initMenu() {
     div.appendChild(span);
 
     div.onclick = () => {
-      document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+      // Verwijder eerdere selectie + opties
+      document.querySelectorAll(".card").forEach(c => {
+        c.classList.remove("selected");
+        const oldOptions = c.querySelector(".card-options");
+        if (oldOptions) oldOptions.remove();
+      });
+
       div.classList.add("selected");
       selectedCoffee = coffee.name;
-      showOptions(coffee.name);
+
+      showOptions(div, coffee.name);
     };
 
     menuDiv.appendChild(div);
@@ -164,36 +185,33 @@ function initMenu() {
 }
 
 // --- Functie: opties tonen ---
-function showOptions(coffeeName) {
-  optionsDiv.innerHTML = "";
+function showOptions(cardElement, coffeeName) {
+  const optionsDiv = document.createElement("div");
+  optionsDiv.className = "card-options";
 
   const sugarIcon = `
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="#6d4c41">
-      <rect x="3" y="8" width="8" height="8" rx="2"/>
-      <rect x="9" y="4" width="8" height="8" rx="2"/>
-      <rect x="13" y="10" width="8" height="8" rx="2"/>
-    </svg>
-  `;
+  <svg width="22" height="22" viewBox="0 0 24 24">
+    <rect x="3" y="8" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+    <rect x="9" y="4" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+    <rect x="13" y="10" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+  </svg>
+`;
 
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
     optionsDiv.innerHTML = `
-      <label>
-        <input type="checkbox" id="milk">
-        🥛 Melk
-      </label>
-      <label>
-        <input type="checkbox" id="sugar">
-        ${sugarIcon} Suiker
-      </label>
+      <label><input type="checkbox" id="milk"> 🥛 Melk</label>
+      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
     `;
   } else if (coffeeName.includes("Latte")) {
     optionsDiv.innerHTML = `
-      <label>
-        <input type="checkbox" id="sugar">
-        ${sugarIcon} Suiker
-      </label>
+      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
     `;
   }
+
+  cardElement.appendChild(optionsDiv);
 }
 
 // --- Check of naam al is opgeslagen ---
