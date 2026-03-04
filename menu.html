@@ -140,6 +140,7 @@
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
       transition: all 0.25s ease;
       margin-top: 15px;
+	  display: none; /* Standaard de bestelknop verbergen */
     }
 
     #order-btn:hover {
@@ -238,7 +239,9 @@
               div.classList.add("selected");
               selectedCoffee = product.name;
               showOptions(div, product.name);
-              showOrderButton();  // Show order button
+			  
+			  // Directly show the order button after selecting a product
+              document.getElementById("order-btn").style.display = "block";  // Show the button  
             };
 
             menuDiv.appendChild(div);  // Add product to menu
@@ -247,13 +250,7 @@
       });
     }
 
-    // Function to show order button
-    function showOrderButton() {
-      const orderButton = document.getElementById("order-btn");
-      if (orderButton) {
-        orderButton.style.display = "block";  // Make the button visible
-      }
-    }
+    
 
     // Show options for coffee (e.g., milk, sugar)
     function showOptions(cardElement, coffeeName) {
@@ -329,10 +326,7 @@
       alert("Bestelling geplaatst! ✅");
 	  
       // Verberg de bestelknop na het plaatsen van de bestelling
-      const orderButton = document.getElementById("order-btn");
-      if (orderButton) {
-        orderButton.style.display = "none";  // Verberg de knop
-      }
+       document.getElementById("order-btn").style.display = "none";  // Hide the button
     };
   </script>
 </head>
