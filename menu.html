@@ -28,8 +28,7 @@ button { width:100%; padding:15px; background:#6d4c41; color:white; border:none;
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
   <div id="options"></div>
-  <button id="order-btn">Bestelling bevestigen</button>
-  <button id="change-name-btn" style="margin-top:10px; background:#a1887f;">Andere naam invullen</button>
+  <button onclick="placeOrder()">Bestelling bevestigen</button>
 </div>
 
 <script type="module">
@@ -41,10 +40,7 @@ const firebaseConfig = {
    apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
   databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen",
-  storageBucket: "koffie-bestellen.firebasestorage.app",
-  messagingSenderId: "592791423506",
-  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+  projectId: "koffie-bestellen"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -136,14 +132,10 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
   initMenu();
 });
 
-// --- Naam wijzigen ---
-document.getElementById("change-name-btn").addEventListener("click", () => {
-  localStorage.removeItem("customerName");
-  location.reload();
-});
+
 
 // --- Bestelling plaatsen ---
-document.getElementById("order-btn").addEventListener("click", () => {
+window.placeOrder = function() {
   if (!customerName) { alert("Vul eerst je naam in!"); return; }
   if (!selectedCoffee) { alert("Kies eerst een koffie ☕"); return; }
 
