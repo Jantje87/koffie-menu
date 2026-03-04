@@ -127,45 +127,47 @@
     const ordersQuery = query(ordersRef, orderByChild('timestamp'));
 
     onValue(ordersQuery, (snapshot) => {
-      orderList.innerHTML = "";
-      let orders = [];
-      
-      snapshot.forEach(childSnapshot => {
-        const order = childSnapshot.val();
-        orders.push(order);
-      });
+  orderList.innerHTML = "";
+  let orders = [];
 
-      // Sorteer de bestellingen op timestamp (nieuwste bovenaan)
-      orders.reverse();  // Omgekeerde volgorde (nieuwste bovenaan)
-
-      // Maak de bestellingen dynamisch
-      orders.forEach(order => {
-        const orderDiv = document.createElement("div");
-        orderDiv.className = "order";
-
-        const orderDetails = document.createElement("span");
-        orderDetails.textContent = `${order.name} bestelde een ${order.coffee} om ${new Date(order.timestamp).toLocaleTimeString()}`;
-        orderDiv.appendChild(orderDetails);
-
-        const orderDetailDiv = document.createElement("div");
-        orderDetailDiv.className = "order-detail";
-        orderDetailDiv.textContent = `Melk: ${order.milk ? "Ja" : "Nee"}, Suiker: ${order.sugar ? "Ja" : "Nee"}`;
-        orderDiv.appendChild(orderDetailDiv);
-
-        // Knop om bestelling als voltooid te markeren
-        const completeButton = document.createElement("button");
-        completeButton.className = "toggle-btn order-btn";
-        completeButton.textContent = order.completed ? "Voltooid" : "Markeer als Voltooid";
-        completeButton.onclick = () => {
-          // Update de status van de bestelling naar 'voltooid'
-          update(ref(db, `orders/${childSnapshot.key}`), { completed: true });
-        };
-
-        // Voeg de knop toe aan de bestelling
-        orderDiv.appendChild(completeButton);
-        orderList.appendChild(orderDiv);
-      });
+  snapshot.forEach(childSnapshot => {
+    const order = childSnapshot.val();
+    orders.push({
+      ...order,
+      key: childSnapshot.key // Voeg de key toe aan het orderobject
     });
+  });
+
+  // Sorteer de bestellingen op timestamp (nieuwste bovenaan)
+  orders.reverse();  // Omgekeerde volgorde (nieuwste bovenaan)
+
+  orders.forEach(order => {
+    const orderDiv = document.createElement("div");
+    orderDiv.className = "order";
+
+    const orderDetails = document.createElement("span");
+    orderDetails.textContent = `${order.name} bestelde een ${order.coffee} om ${new Date(order.timestamp).toLocaleTimeString()}`;
+    orderDiv.appendChild(orderDetails);
+
+    const orderDetailDiv = document.createElement("div");
+    orderDetailDiv.className = "order-detail";
+    orderDetailDiv.textContent = `Melk: ${order.milk ? "Ja" : "Nee"}, Suiker: ${order.sugar ? "Ja" : "Nee"}`;
+    orderDiv.appendChild(orderDetailDiv);
+
+    // Knop om bestelling als voltooid te markeren
+    const completeButton = document.createElement("button");
+    completeButton.className = "toggle-btn order-btn";
+    completeButton.textContent = order.completed ? "Voltooid" : "Markeer als Voltooid";
+    completeButton.onclick = () => {
+      // Gebruik de key uit het order object
+      update(ref(db, `orders/${order.key}`), { completed: true });
+    };
+
+    // Voeg de knop toe aan de bestelling
+    orderDiv.appendChild(completeButton);
+    orderList.appendChild(orderDiv);
+  });
+});
 
   </script>
 </head>
