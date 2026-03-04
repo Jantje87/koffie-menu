@@ -3,78 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
-
+<title>Bestellingen Overzicht</title>
 <style>
-body {
-  font-family: Arial;
-  background: #f0ebe3;
-  padding: 20px;
+body { font-family: Arial, sans-serif; background:#f5f3ef; padding:20px; }
+h1 { text-align:center; color:#3e2723; }
+.order-card {
+  background:white;
+  border-radius:15px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
-
-.order {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.order-card img {
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+button {
+  padding:8px 12px;
+  background:#6d4c41;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:10px;
 }
 </style>
 </head>
-
 <body>
 
-<h1>📋 Binnenkomende Bestellingen</h1>
-<button onclick="clearOrders()" style="margin-bottom:20px;padding:10px;">
-  🗑️ Einde dag – wis alle bestellingen
-</button>
+<h1>☕ Bestellingen</h1>
 <div id="orders"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, remove } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// 🔹 Firebase config (jouw gegevens invullen)
 const firebaseConfig = {
-   apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+  apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
   databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen",
-  storageBucket: "koffie-bestellen.firebasestorage.app",
-  messagingSenderId: "592791423506",
-  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+  projectId: "koffie-bestellen"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const ordersRef = ref(db, "orders");
 
-const ordersDiv = document.getElementById("orders");
+// 🔹 Afbeeldingen koppelen aan koffienaam
+const coffeeImages = {
+  "Espresso": "espresso.jpg",
+  "Long Black": "longblack.jpg",
+  "Latte Macchiato": "lattemacchiato.jpg",
+  "Latte Macchiato + Pumpkin Spice": "pumpkinspice.jpg",
+  "Latte Macchiato + Vanille": "vanille.jpg",
+  "Latte Macchiato + Caramel": "caramel.jpg"
+};
 
-onValue(ref(db, "orders"), snapshot => {
-  const data = snapshot.val();
+// 🔹 Bestellingen realtime ophalen
+onValue(ordersRef, (snapshot) => {
+  const ordersDiv = document.getElementById("orders");
   ordersDiv.innerHTML = "";
 
-  for (let id in data) {
-    const order = data[id];
+  snapshot.forEach((childSnapshot) => {
+    const order = childSnapshot.val();
+    const key = childSnapshot.key;
 
     const div = document.createElement("div");
-    div.className = "order";
-    div.innerHTML = `
-  <strong>${order.name}</strong><br>
-  ${order.coffee}<br>
-  Melk: ${order.milk ? "Ja" : "Nee"}<br>
-  Suiker: ${order.sugar ? "Ja" : "Nee"}<br>
-  Tijd: ${order.time}
-`;
+    div.className = "order-card";
 
+    const img = document.createElement("img");
+    img.src = coffeeImages[order.coffee] || "espresso.jpg";
+    div.appendChild(img);
+
+    div.innerHTML += `
+      <strong>Naam:</strong> ${order.name}<br>
+      <strong>Koffie:</strong> ${order.coffee}<br>
+      <strong>Melk:</strong> ${order.milk ? "Ja" : "Nee"}<br>
+      <strong>Suiker:</strong> ${order.sugar ? "Ja" : "Nee"}<br>
+      <strong>Tijd:</strong> ${order.time}<br>
+    `;
+
+    const doneButton = document.createElement("button");
+    doneButton.textContent = "Bestelling afronden";
+    doneButton.onclick = () => {
+      remove(ref(db, "orders/" + key));
+    };
+
+    div.appendChild(doneButton);
     ordersDiv.appendChild(div);
-  }
+  });
 });
-window.clearOrders = function() {
-  if (confirm("Weet je zeker dat je alle bestellingen wilt verwijderen?")) {
-    remove(ref(db, "orders"));
-  }
-}
 </script>
 
 </body>
