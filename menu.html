@@ -38,10 +38,13 @@ import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.
 
 // --- Firebase config ---
 const firebaseConfig = {
-  apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+   apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
-  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "koffie-bestellen"
+  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "koffie-bestellen",
+  storageBucket: "koffie-bestellen.firebasestorage.app",
+  messagingSenderId: "592791423506",
+  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
