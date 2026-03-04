@@ -62,33 +62,6 @@
       padding-top: 20px;
     }
 
-    /* Bestelknop bovenaan het scherm */
-    #order-btn {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: 600;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #6d4c41, #8d6e63);
-      color: white;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-      transition: all 0.25s ease;
-      margin-bottom: 20px; /* Ruimte tussen de knop en de producten */
-      display: none; /* Standaard de bestelknop verbergen */
-    }
-
-    #order-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    #order-btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    }
-
     .card {
       display: flex;
       flex-direction: column;
@@ -152,6 +125,33 @@
       height: 18px;
     }
 
+    /* Bestelknop */
+    .order-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6d4c41, #8d6e63);
+      color: white;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.25s ease;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .order-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .order-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
     /* Responsive design voor mobiel */
     @media (max-width: 600px) {
       .card {
@@ -175,7 +175,7 @@
         padding: 10px;
       }
 
-      #order-btn {
+      .order-btn {
         font-size: 16px;
       }
     }
@@ -201,31 +201,40 @@
 
     let selectedCoffee = null;
 
-  
-    // Initialize menu screen
+    const coffees = [
+      { name: "Espresso", img: "espresso.jpg" },
+      { name: "Long Black", img: "longblack.jpg" },
+      { name: "Latte Macchiato", img: "latte.jpg" },
+      { name: "Latte Macchiato Pumpkin Spice", img: "pumpkinspice.jpg" },
+      { name: "Latte Macchiato Vanille", img: "vanille.jpg" },
+      { name: "Latte Macchiato Caramel", img: "caramel.jpg" },
+      { name: "Ijskoffie", img: "ijskoffie.jpg" },
+      { name: "Thee", img: "thee.jpg" }
+    ];
+
+    // Initialiseer het menu
     function initMenu() {
       const menuDiv = document.getElementById("menu-screen");
-      menuDiv.innerHTML = "";  // Clear the menu
+      menuDiv.innerHTML = "";  // Maak het menu leeg
 
       selectedCoffee = null;
 
-      // Fetch products from Firebase
+      // Haal producten uit Firebase
       const productsRef = ref(db, "products");
       onValue(productsRef, (snapshot) => {
         snapshot.forEach((childSnapshot) => {
           const product = childSnapshot.val();
 
-          // Only display available products
           if (product.available) {
             const div = document.createElement("div");
             div.className = "card";
 
             const img = document.createElement("img");
-            img.src = product.img;  // Add image
+            img.src = product.img;
             div.appendChild(img);
 
             const span = document.createElement("span");
-            span.textContent = product.name;  // Add product name
+            span.textContent = product.name;
             div.appendChild(span);
 
             div.onclick = () => {
@@ -238,20 +247,26 @@
               div.classList.add("selected");
               selectedCoffee = product.name;
               showOptions(div, product.name);
-			  
-			  // Directly show the order button after selecting a product
-              document.getElementById("order-btn").style.display = "block";  // Show the button  
+
+              // Maak de bestelknop zichtbaar na selectie
+              const orderButton = div.querySelector(".order-btn");
+              if (!orderButton) {
+                const newOrderButton = document.createElement("button");
+                newOrderButton.className = "order-btn";
+                newOrderButton.textContent = "☕ Bestelling plaatsen";
+                newOrderButton.style.display = "block";
+                newOrderButton.onclick = () => placeOrder(product.name);
+                div.appendChild(newOrderButton);
+              }
             };
 
-            menuDiv.appendChild(div);  // Add product to menu
+            menuDiv.appendChild(div);
           }
         });
       });
     }
 
-    
-
-    // Show options for coffee (e.g., milk, sugar)
+    // Toon opties (zoals suiker en melk)
     function showOptions(cardElement, coffeeName) {
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "card-options";
@@ -264,7 +279,7 @@
         </svg>
       `;
 
-      if (coffeeName === "Espresso" || coffeeName === "Lungo") {
+      if (coffeeName === "Espresso" || coffeeName === "Long Black") {
         optionsDiv.innerHTML = `
           <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
           <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
@@ -275,16 +290,33 @@
         `;
       }
 
-      // Stop bubbelen zodat checkboxes werken
       optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
         cb.addEventListener("click", (e) => e.stopPropagation());
       });
 
       cardElement.appendChild(optionsDiv);
+    }
 
-      setTimeout(() => {
-        cardElement.classList.add("selected");
-      }, 10);
+    // Bestelling plaatsen
+    function placeOrder(coffeeName) {
+      const selectedCard = document.querySelector(".card.selected");
+      const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
+      const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
+
+      const order = {
+        name: localStorage.getItem("customerName"),
+        coffee: coffeeName,
+        milk: milk,
+        sugar: sugar,
+        time: new Date().toLocaleTimeString()
+      };
+
+      push(ref(db, "orders"), order);
+      alert("Bestelling geplaatst! ✅");
+
+      // Verberg de bestelknop na het plaatsen van de bestelling
+      const orderButton = selectedCard.querySelector(".order-btn");
+      if (orderButton) orderButton.style.display = "none";
     }
 
     // Naam invoer scherm
@@ -299,35 +331,8 @@
       document.getElementById("menu-screen").style.display = "block";
       initMenu();
     };
-
-    // Bestelknop
-    document.getElementById("order-btn").onclick = () => {
-      if (!selectedCoffee) {
-        alert("Selecteer eerst een koffie");
-        return;
-      }
-
-      const selectedCard = document.querySelector(".card.selected");
-      if (!selectedCard) return;
-
-      const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
-      const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
-
-      const order = {
-        name: localStorage.getItem("customerName"),
-        coffee: selectedCoffee,
-        milk: milk,
-        sugar: sugar,
-        time: new Date().toLocaleTimeString()
-      };
-
-      push(ref(db, "orders"), order);
-      alert("Bestelling geplaatst! ✅");
-	  
-      // Verberg de bestelknop na het plaatsen van de bestelling
-       document.getElementById("order-btn").style.display = "none";  // Hide the button
-    };
   </script>
+
 </head>
 
 <body>
@@ -338,9 +343,8 @@
     <button id="next-btn">Volgende</button>
   </div>
 
-    <!-- Menu scherm -->
+  <!-- Menu scherm -->
   <div id="menu-screen" style="display:none;">
-    <button id="order-btn">☕ Bestelling plaatsen</button>
     <!-- Menu wordt hier dynamisch geladen -->
   </div>
 </body>
