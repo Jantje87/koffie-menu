@@ -89,12 +89,7 @@ function initMenu() {
     div.appendChild(span);
 
     // Klik selectie
-    div.onclick = () => {
-      document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
-      div.classList.add("selected");
-      selectedCoffee = coffee.name;
-      showOptions(coffee.name);
-    };
+    
 
     menuDiv.appendChild(div);
   });
