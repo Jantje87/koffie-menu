@@ -231,12 +231,23 @@
           div.classList.add("selected");
           selectedCoffee = product.name;
           showOptions(div, product.name);
+		  
+		   // Maak de bestelknop zichtbaar wanneer een product wordt geselecteerd
+          showOrderButton();
         };
 
         menuDiv.appendChild(div);  // Voeg het product toe aan het menu
       }
     });
   });
+}
+
+// Functie om de bestelknop zichtbaar te maken
+function showOrderButton() {
+  const orderButton = document.getElementById("order-btn");
+  if (orderButton) {
+    orderButton.style.display = "block";  // Maak de knop zichtbaar
+  }
 }
 
     function showOptions(cardElement, coffeeName) {
@@ -310,6 +321,12 @@
 
       push(ref(db, "orders"), order);
       alert("Bestelling geplaatst! ✅");
+	  
+	    // Verberg de bestelknop na het plaatsen van de bestelling
+  const orderButton = document.getElementById("order-btn");
+  if (orderButton) {
+    orderButton.style.display = "none";  // Verberg de knop
+  }
     };
   </script>
 </head>
