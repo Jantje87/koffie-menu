@@ -201,20 +201,19 @@ function showOptions(cardElement, coffeeName) {
 `;
 
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
-  optionsDiv.innerHTML = `
-    <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
-    <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-  `;
-} else if (coffeeName.includes("Latte")) {
-  optionsDiv.innerHTML = `
-    <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-  `;
+    optionsDiv.innerHTML = `
+      <label><input type="checkbox" id="milk"> 🥛 Melk</label>
+      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
+    `;
+  } else if (coffeeName.includes("Latte")) {
+    optionsDiv.innerHTML = `
+      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
+    `;
+  }
+
+  cardElement.appendChild(optionsDiv);
 }
 
-// Stop click event op checkboxes van “bubbelen” naar de kaart
-optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
-  cb.addEventListener("click", (e) => e.stopPropagation());
-});
 // --- Check of naam al is opgeslagen ---
 window.addEventListener("DOMContentLoaded", () => {
   const storedName = localStorage.getItem("customerName");
@@ -227,15 +226,15 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- Naam opslaan en menu tonen ---
-document.getElementById("name-next-btn").onclick = () => {
+document.getElementById("name-next-btn").addEventListener("click", () => {
   const nameInput = document.getElementById("customer-name").value.trim();
   if (!nameInput) { alert("Vul je naam in 😃"); return; }
   customerName = nameInput;
   localStorage.setItem("customerName", customerName);
-  document.getElementById("name-screen").style.display = "none";
-  document.getElementById("menu-screen").style.display = "block";
+  nameContainer.style.display = "none";
+  menuContainer.style.display = "block";
   initMenu();
-};
+});
 
 // --- Naam wijzigen ---
 // document.getElementById("change-name-btn").addEventListener("click", () => {
