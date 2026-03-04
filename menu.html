@@ -242,22 +242,21 @@
                 c.classList.remove("selected");
                 const oldOptions = c.querySelector(".card-options");
                 if (oldOptions) oldOptions.remove();
+                const oldButton = c.querySelector(".order-btn");
+                if (oldButton) oldButton.remove(); // Verwijder de bestelknop van het vorige product
               });
 
               div.classList.add("selected");
               selectedCoffee = product.name;
               showOptions(div, product.name);
 
-              // Maak de bestelknop zichtbaar na selectie
-              const orderButton = div.querySelector(".order-btn");
-              if (!orderButton) {
-                const newOrderButton = document.createElement("button");
-                newOrderButton.className = "order-btn";
-                newOrderButton.textContent = "☕ Bestelling plaatsen";
-                newOrderButton.style.display = "block";
-                newOrderButton.onclick = () => placeOrder(product.name);
-                div.appendChild(newOrderButton);
-              }
+              // Voeg de bestelknop toe aan het geselecteerde product
+              const orderButton = document.createElement("button");
+              orderButton.className = "order-btn";
+              orderButton.textContent = "☕ Bestelling plaatsen";
+              orderButton.style.display = "block";
+              orderButton.onclick = () => placeOrder(product.name);
+              div.appendChild(orderButton);
             };
 
             menuDiv.appendChild(div);
@@ -266,7 +265,7 @@
       });
     }
 
-    // Toon opties (zoals suiker en melk)
+    // Functie om de bestelknop zichtbaar te maken
     function showOptions(cardElement, coffeeName) {
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "card-options";
