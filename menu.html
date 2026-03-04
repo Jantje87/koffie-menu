@@ -13,6 +13,7 @@ h1,h2 { text-align:center; color:#3e2723; }
 .selected { border:3px solid #6d4c41; }
 button { width:100%; padding:15px; background:#6d4c41; color:white; border:none; border-radius:10px; font-size:16px; margin-top:15px; }
 #options label { display:block; margin-top:5px; font-size:14px; }
+.card img { width:100%; height:150px; object-fit:cover; border-radius:10px; margin-bottom:10px; }
 </style>
 </head>
 <body>
@@ -27,24 +28,25 @@ button { width:100%; padding:15px; background:#6d4c41; color:white; border:none;
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
   <div id="options"></div>
-	<button id="order-btn">Bestelling bevestigen</button>
+  <button id="order-btn">Bestelling bevestigen</button>
+  <button id="change-name-btn" style="margin-top:10px; background:#a1887f;">Andere naam invullen</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Firebase config invullen
+// --- Firebase config ---
 const firebaseConfig = {
   apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
   databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen",
+  projectId: "koffie-bestellen"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// --- Variabelen ---
 let customerName = null;
 let selectedCoffee = null;
 
@@ -57,12 +59,13 @@ const coffees = [
   { name: "Latte Macchiato + Caramel", img: "caramel.jpg" }
 ];
 
+// --- Elementen ---
 const menuDiv = document.getElementById("menu");
 const optionsDiv = document.getElementById("options");
 const nameContainer = document.getElementById("name-container");
 const menuContainer = document.getElementById("menu-container");
 
-// Functie om menu te bouwen
+// --- Functie: menu bouwen ---
 function initMenu() {
   menuDiv.innerHTML = "";
   selectedCoffee = null;
@@ -72,18 +75,12 @@ function initMenu() {
     const div = document.createElement("div");
     div.className = "card";
 
-    // Voeg afbeelding toe
+    // Afbeelding
     const img = document.createElement("img");
-    img.src = coffee.img; // gebruik pad of URL
-    img.style.width = "100%";
-	img.style.height = "200px";   // hier voeg je de hoogte toe
-	img.style.objectFit = "cover"; // voor mooie bijsnijding
-    img.style.borderRadius = "10px";
-    img.style.marginBottom = "10px";
-
+    img.src = coffee.img; // pad of URL
     div.appendChild(img);
 
-    // Voeg koffie naam toe
+    // Naam
     const span = document.createElement("span");
     span.textContent = coffee.name;
     div.appendChild(span);
@@ -100,23 +97,21 @@ function initMenu() {
   });
 }
 
-// Toon melk/suiker opties afhankelijk van koffie
-function showOptions(coffee) {
+// --- Functie: opties tonen ---
+function showOptions(coffeeName) {
   optionsDiv.innerHTML = "";
 
-  if (coffee === "Espresso" || coffee === "Long Black") {
+  if (coffeeName === "Espresso" || coffeeName === "Long Black") {
     optionsDiv.innerHTML += `
       <label><input type="checkbox" id="milk"> Melk</label>
       <label><input type="checkbox" id="sugar"> Suiker</label>
     `;
-  } else if (coffee.includes("Latte")) {
-    optionsDiv.innerHTML += `
-      <label><input type="checkbox" id="sugar"> Suiker</label>
-    `;
+  } else if (coffeeName.includes("Latte")) {
+    optionsDiv.innerHTML += `<label><input type="checkbox" id="sugar"> Suiker</label>`;
   }
 }
 
-// Check of naam al in localStorage staat
+// --- Check of naam al is opgeslagen ---
 window.addEventListener("DOMContentLoaded", () => {
   const storedName = localStorage.getItem("customerName");
   if (storedName) {
@@ -127,13 +122,10 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Naam opslaan en menu tonen
+// --- Naam opslaan en menu tonen ---
 document.getElementById("name-next-btn").addEventListener("click", () => {
   const nameInput = document.getElementById("customer-name").value.trim();
-  if (!nameInput) {
-    alert("Vul je naam in 😃");
-    return;
-  }
+  if (!nameInput) { alert("Vul je naam in 😃"); return; }
   customerName = nameInput;
   localStorage.setItem("customerName", customerName);
   nameContainer.style.display = "none";
@@ -141,7 +133,13 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
   initMenu();
 });
 
-// Bestelling plaatsen
+// --- Naam wijzigen ---
+document.getElementById("change-name-btn").addEventListener("click", () => {
+  localStorage.removeItem("customerName");
+  location.reload();
+});
+
+// --- Bestelling plaatsen ---
 document.getElementById("order-btn").addEventListener("click", () => {
   if (!customerName) { alert("Vul eerst je naam in!"); return; }
   if (!selectedCoffee) { alert("Kies eerst een koffie ☕"); return; }
@@ -162,5 +160,6 @@ document.getElementById("order-btn").addEventListener("click", () => {
   location.reload();
 });
 </script>
+
 </body>
 </html>
