@@ -27,7 +27,7 @@ button { width:100%; padding:15px; background:#6d4c41; color:white; border:none;
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
   <div id="options"></div>
-	<button onclick="placeOrder()">Bestelling bevestigen</button>
+	<button id="order-btn">Bestelling bevestigen</button>
 </div>
 
 <script type="module">
@@ -142,19 +142,12 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
 });
 
 // Bestelling plaatsen
-window.placeOrder = function() {
-  console.log("Plaats bestelling:", customerName, selectedCoffee);
-  
-  if (!customerName) {
-    alert("Vul eerst je naam in!");
-    return;
-  }
-  if (!selectedCoffee) {
-    alert("Kies eerst een koffie ☕");
-    return;
-  }
+document.getElementById("order-btn").addEventListener("click", () => {
+  if (!customerName) { alert("Vul eerst je naam in!"); return; }
+  if (!selectedCoffee) { alert("Kies eerst een koffie ☕"); return; }
 
-  
+  const milk = document.getElementById("milk")?.checked || false;
+  const sugar = document.getElementById("sugar")?.checked || false;
 
   push(ref(db, "orders"), {
     name: customerName,
@@ -167,7 +160,7 @@ window.placeOrder = function() {
 
   alert(`Bestelling geplaatst, ${customerName}!`);
   location.reload();
-};
+});
 </script>
 </body>
 </html>
