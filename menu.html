@@ -190,29 +190,28 @@ function showOptions(cardElement, coffeeName) {
   optionsDiv.className = "card-options";
 
   const sugarIcon = `
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5">
-      <rect x="3" y="8" width="8" height="8" rx="2"/>
-      <rect x="9" y="4" width="8" height="8" rx="2"/>
-      <rect x="13" y="10" width="8" height="8" rx="2"/>
-    </svg>
-  `;
+  <svg width="22" height="22" viewBox="0 0 24 24">
+    <rect x="3" y="8" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+    <rect x="9" y="4" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+    <rect x="13" y="10" width="8" height="8" rx="2"
+      fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5"/>
+  </svg>
+`;
 
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
     optionsDiv.innerHTML = `
-      <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
-      <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+      <label><input type="checkbox" id="milk"> 🥛 Melk</label>
+      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
     `;
   } else if (coffeeName.includes("Latte")) {
     optionsDiv.innerHTML = `
-      <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+      <label><input type="checkbox" id="sugar"> ${sugarIcon} Suiker</label>
     `;
   }
 
   cardElement.appendChild(optionsDiv);
-
-  setTimeout(() => {
-    cardElement.classList.add("selected");
-  }, 10);
 }
 
 // --- Check of naam al is opgeslagen ---
@@ -248,26 +247,23 @@ document.getElementById("order-btn").addEventListener("click", () => {
   if (!customerName) { alert("Vul eerst je naam in!"); return; }
   if (!selectedCoffee) { alert("Kies eerst een koffie ☕"); return; }
 
- const selectedCard = document.querySelector(".card.selected");
-  if (!selectedCard) return;
+  const milk = document.getElementById("milk")?.checked || false;
+  const sugar = document.getElementById("sugar")?.checked || false;
 
-  // Lees checkboxen vanuit de geselecteerde kaart
-  const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
-  const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
+  console.log("Plaats bestelling:", customerName, selectedCoffee, milk, sugar);
 
-  const order = {
-    name: localStorage.getItem("customerName"),
+  push(ref(db, "orders"), {
+    name: customerName,
     coffee: selectedCoffee,
     milk: milk,
     sugar: sugar,
-    time: new Date().toLocaleTimeString()
-  };
-
-  // Firebase push
-  push(ref(db, "orders"), order);
-
-  alert("Bestelling geplaatst! ✅");
-};
+    time: new Date().toLocaleTimeString(),
+    status: "nieuw"
+  })
+  .then(() => {
+    alert(`Bestelling geplaatst, ${customerName}!`);
+    location.reload();
+  })
   .catch((err) => alert("Fout bij plaatsen bestelling: " + err));
 });
 </script>
