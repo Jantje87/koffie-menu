@@ -1,254 +1,318 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Koffie Bestellen</title>
-<style>
-body { font-family: Arial, sans-serif; background:#f5f3ef; margin:0; padding:20px; }
-h1,h2 { text-align:center; color:#3e2723; }
-.container { max-width:500px; margin:auto; }
-.card {
-  display: flex;
-  align-items: center;      /* verticale centrering */
-  gap: 20px;
-  background: white;
-  border-radius: 15px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: 0.2s;
-}
+  <meta charset="UTF-8">
+  <title>Koffie Menu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0 15px;
+    }
 
-.card:hover {
-  transform: scale(1.02);
-}
+    /* Naam scherm */
+    #name-screen {
+      max-width: 400px;
+      margin: 50px auto;
+      text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
 
-.card img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 12px;
-  flex-shrink: 0;
-}
+    #name-screen input {
+      width: 80%;
+      padding: 10px;
+      margin: 15px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
 
-.card span {
-  flex: 1;
-  text-align: center;      /* horizontale centrering */
-  font-size: 18px;
-  font-weight: 600;
-}
+    #name-screen button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6d4c41, #8d6e63);
+      color: white;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      transition: all 0.25s ease;
+    }
 
-.selected {
-  border: 3px solid #6d4c41;
-}
+    #name-screen button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
 
-/* 📱 Mobiel: onder elkaar */
-@media (max-width: 600px) {
-  .card {
-    flex-direction: column;
-    text-align: center;
-  }
+    #name-screen button:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
-  .card img {
-    width: 100%;
-    height: 160px;
-  }
-}
+    /* Menu scherm */
+    #menu-screen {
+      max-width: 600px;
+      margin: 20px auto;
+    }
 
-/* 🎯 Mooie bestelknop */
-#order-btn {
-  width: 100%;
-  padding: 16px;
-  font-size: 18px;
-  font-weight: 600;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: white;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: 0.2s;
+      position: relative;
+    }
 
-  background: linear-gradient(135deg, #6d4c41, #8d6e63);
-  color: white;
+    .card:hover {
+      transform: scale(1.02);
+    }
 
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-  transition: all 0.25s ease;
-}
+    .card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
 
-#order-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
+    .card span {
+      flex: 1;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+    }
 
-#order-btn:active {
-  transform: scale(0.97);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-</style>
-</head>
-<body>
+    /* Opties onder de kaart */
+    .card-options {
+      max-height: 0;
+      overflow: hidden;
+      padding-top: 0;
+      border-top: 1px solid #eee;
+      transition: max-height 0.5s ease-out, padding-top 0.5s ease-out;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
 
-<div id="name-container">
-  <h2>Welkom! Vul eerst je naam in:</h2>
-  <input type="text" id="customer-name" placeholder="Je naam">
-  <button id="name-next-btn">Volgende</button>
-</div>
+    .card.selected .card-options {
+      max-height: 200px;
+      padding-top: 10px;
+    }
 
-<div id="menu-container" style="display:none;">
-  <h1>☕ Koffie Menu</h1>
-  <div class="container" id="menu"></div>
-  <div id="options"></div>
-  <button id="order-btn">☕ Bestelling plaatsen</button>
-</div>
+    .card-options label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    /* Checkboxes iets groter */
+    .card-options input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
 
-// --- Firebase config invullen ---
-const firebaseConfig = {
-  apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-  authDomain: "koffie-bestellen.firebaseapp.com",
-  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    /* Bestelknop */
+    #order-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6d4c41, #8d6e63);
+      color: white;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      transition: all 0.25s ease;
+      margin-top: 15px;
+    }
 
-// --- Variabelen ---
-let customerName = null;
-let selectedCoffee = null;
+    #order-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
 
-const coffees = [
-  { name: "Espresso", img: "espresso.jpg" },
-  { name: "Long Black", img: "longblack.jpg" },
-  { name: "Latte Macchiato", img: "lattemacchiato.jpg" },
-  { name: "Latte Macchiato + Pumpkin Spice", img: "pumpkinspice.jpg" },
-  { name: "Latte Macchiato + Vanille", img: "vanille.jpg" },
-  { name: "Latte Macchiato + Caramel", img: "caramel.jpg" },
-  { name: "Thee", img: "thee.jpg" }
-];
+    #order-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
-// --- Elementen ---
-const menuDiv = document.getElementById("menu");
-const optionsDiv = document.getElementById("options");
-const nameContainer = document.getElementById("name-container");
-const menuContainer = document.getElementById("menu-container");
+    /* Mobiel */
+    @media (max-width: 600px) {
+      .card {
+        flex-direction: column;
+        text-align: center;
+      }
 
-// --- Functie: menu bouwen ---
-function initMenu() {
-  menuDiv.innerHTML = "";
-  selectedCoffee = null;
-  optionsDiv.innerHTML = "";
+      .card img {
+        width: 100%;
+        height: 160px;
+      }
+    }
+  </style>
+  <!-- Firebase -->
+  <script type="module">
+    // Firebase config
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-database.js";
 
-  coffees.forEach(coffee => {
-    const div = document.createElement("div");
-    div.className = "card";
-
-    const img = document.createElement("img");
-    img.src = coffee.img; // of URL
-    div.appendChild(img);
-
-    const span = document.createElement("span");
-    span.textContent = coffee.name;
-    div.appendChild(span);
-
-    div.onclick = () => {
-      document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
-      div.classList.add("selected");
-      selectedCoffee = coffee.name;
-      showOptions(coffee.name);
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
-    menuDiv.appendChild(div);
-  });
-}
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-// --- Functie: opties tonen ---
-function showOptions(coffeeName) {
-  optionsDiv.innerHTML = "";
+    // Coffies
+    const coffees = [
+      { name: "Espresso", img: "espresso.jpg" },
+      { name: "Long Black", img: "longblack.jpg" },
+      { name: "Latte Macchiato", img: "latte.jpg" },
+      { name: "Latte Macchiato Pumpkin Spice", img: "latte-pumpkin.jpg" },
+      { name: "Latte Macchiato Vanille", img: "latte-vanilla.jpg" },
+      { name: "Latte Macchiato Caramel", img: "latte-caramel.jpg" }
+    ];
 
-  const sugarIcon = `
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="#6d4c41">
-      <rect x="3" y="8" width="8" height="8" rx="2"/>
-      <rect x="9" y="4" width="8" height="8" rx="2"/>
-      <rect x="13" y="10" width="8" height="8" rx="2"/>
-    </svg>
-  `;
+    let selectedCoffee = null;
 
-  if (coffeeName === "Espresso" || coffeeName === "Long Black") {
-    optionsDiv.innerHTML = `
-      <label>
-        <input type="checkbox" id="milk">
-        🥛 Melk
-      </label>
-      <label>
-        <input type="checkbox" id="sugar">
-        ${sugarIcon} Suiker
-      </label>
-    `;
-  } else if (coffeeName.includes("Latte")) {
-    optionsDiv.innerHTML = `
-      <label>
-        <input type="checkbox" id="sugar">
-        ${sugarIcon} Suiker
-      </label>
-    `;
-  }
-}
+    function initMenu() {
+      const menuDiv = document.getElementById("menu-screen");
+      menuDiv.innerHTML = "";
+      selectedCoffee = null;
 
-// --- Check of naam al is opgeslagen ---
-window.addEventListener("DOMContentLoaded", () => {
-  const storedName = localStorage.getItem("customerName");
-  if (storedName) {
-    customerName = storedName;
-    nameContainer.style.display = "none";
-    menuContainer.style.display = "block";
-    initMenu();
-  }
-});
+      coffees.forEach(coffee => {
+        const div = document.createElement("div");
+        div.className = "card";
 
-// --- Naam opslaan en menu tonen ---
-document.getElementById("name-next-btn").addEventListener("click", () => {
-  const nameInput = document.getElementById("customer-name").value.trim();
-  if (!nameInput) { alert("Vul je naam in 😃"); return; }
-  customerName = nameInput;
-  localStorage.setItem("customerName", customerName);
-  nameContainer.style.display = "none";
-  menuContainer.style.display = "block";
-  initMenu();
-});
+        const img = document.createElement("img");
+        img.src = coffee.img;
+        div.appendChild(img);
 
-// --- Naam wijzigen ---
-// document.getElementById("change-name-btn").addEventListener("click", () => {
-//  localStorage.removeItem("customerName");
-//  location.reload();
-// });
+        const span = document.createElement("span");
+        span.textContent = coffee.name;
+        div.appendChild(span);
 
-// --- Bestelling plaatsen ---
-document.getElementById("order-btn").addEventListener("click", () => {
-  if (!customerName) { alert("Vul eerst je naam in!"); return; }
-  if (!selectedCoffee) { alert("Kies eerst een koffie ☕"); return; }
+        div.onclick = () => {
+          document.querySelectorAll(".card").forEach(c => {
+            c.classList.remove("selected");
+            const oldOptions = c.querySelector(".card-options");
+            if (oldOptions) oldOptions.remove();
+          });
 
-  const milk = document.getElementById("milk")?.checked || false;
-  const sugar = document.getElementById("sugar")?.checked || false;
+          div.classList.add("selected");
+          selectedCoffee = coffee.name;
+          showOptions(div, coffee.name);
+        };
 
-  console.log("Plaats bestelling:", customerName, selectedCoffee, milk, sugar);
+        menuDiv.appendChild(div);
+      });
+    }
 
-  push(ref(db, "orders"), {
-    name: customerName,
-    coffee: selectedCoffee,
-    milk: milk,
-    sugar: sugar,
-    time: new Date().toLocaleTimeString(),
-    status: "nieuw"
-  })
-  .then(() => {
-    alert(`Bestelling geplaatst, ${customerName}!`);
-    location.reload();
-  })
-  .catch((err) => alert("Fout bij plaatsen bestelling: " + err));
-});
-</script>
+    function showOptions(cardElement, coffeeName) {
+      const optionsDiv = document.createElement("div");
+      optionsDiv.className = "card-options";
 
+      const sugarIcon = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5">
+          <rect x="3" y="8" width="8" height="8" rx="2"/>
+          <rect x="9" y="4" width="8" height="8" rx="2"/>
+          <rect x="13" y="10" width="8" height="8" rx="2"/>
+        </svg>
+      `;
+
+      if (coffeeName === "Espresso" || coffeeName === "Long Black") {
+        optionsDiv.innerHTML = `
+          <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
+          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+        `;
+      } else if (coffeeName.includes("Latte")) {
+        optionsDiv.innerHTML = `
+          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
+        `;
+      }
+
+      // Stop bubbelen zodat checkboxes werken
+      optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        cb.addEventListener("click", (e) => e.stopPropagation());
+      });
+
+      cardElement.appendChild(optionsDiv);
+
+      setTimeout(() => {
+        cardElement.classList.add("selected");
+      }, 10);
+    }
+
+    // Naam invoer scherm
+    document.getElementById("next-btn").onclick = () => {
+      const nameInput = document.getElementById("customer-name").value.trim();
+      if (!nameInput) {
+        alert("Vul eerst je naam in!");
+        return;
+      }
+      localStorage.setItem("customerName", nameInput);
+      document.getElementById("name-screen").style.display = "none";
+      document.getElementById("menu-screen").style.display = "block";
+      initMenu();
+    };
+
+    // Bestelknop
+    document.getElementById("order-btn").onclick = () => {
+      if (!selectedCoffee) {
+        alert("Selecteer eerst een koffie");
+        return;
+      }
+
+      const selectedCard = document.querySelector(".card.selected");
+      if (!selectedCard) return;
+
+      const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
+      const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
+
+      const order = {
+        name: localStorage.getItem("customerName"),
+        coffee: selectedCoffee,
+        milk: milk,
+        sugar: sugar,
+        time: new Date().toLocaleTimeString()
+      };
+
+      push(ref(db, "orders"), order);
+      alert("Bestelling geplaatst! ✅");
+    };
+  </script>
+</head>
+<body>
+  <!-- Naam scherm -->
+  <div id="name-screen">
+    <h2>Vul je naam in</h2>
+    <input type="text" id="customer-name" placeholder="Naam">
+    <button id="next-btn">Volgende</button>
+  </div>
+
+  <!-- Menu scherm -->
+  <div id="menu-screen" style="display:none;">
+    <!-- Menu wordt hier dynamisch geladen -->
+    <button id="order-btn">☕ Bestelling plaatsen</button>
+  </div>
 </body>
 </html>
