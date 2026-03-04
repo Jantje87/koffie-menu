@@ -56,10 +56,18 @@ button {
 
 <body>
 
-<h1>☕ Koffie Menu</h1>
+<div id="name-container">
+  <h2>Welkom! Vul eerst je naam in:</h2>
+  <input type="text" id="customer-name" placeholder="Je naam">
+  <button onclick="submitName()">Volgende</button>
+</div>
 
-<div class="container" id="menu"></div>
-<button onclick="placeOrder()">Bestelling bevestigen</button>
+<div id="menu-container" style="display:none;">
+  <h1>☕ Koffie Menu</h1>
+  <div class="container" id="menu"></div>
+  <div id="options" style="margin-top:15px;"></div>
+  <button onclick="placeOrder()">Bestelling bevestigen</button>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -83,6 +91,22 @@ const coffees = [
   "Latte Macchiato + Vanille",
   "Latte Macchiato + Caramel"
 ];
+
+let customerName = null;
+
+// Functie om naam op te slaan
+window.submitName = function() {
+  const nameInput = document.getElementById("customer-name").value.trim();
+  if (!nameInput) {
+    alert("Vul je naam in 😃");
+    return;
+  }
+  customerName = nameInput;
+
+  // Toon menu en verberg naamveld
+  document.getElementById("name-container").style.display = "none";
+  document.getElementById("menu-container").style.display = "block";
+};
 
 let selectedCoffee = null;
 
@@ -124,6 +148,11 @@ coffees.forEach(coffee => {
 });
 
 window.placeOrder = function() {
+  if (!customerName) {
+    alert("Vul eerst je naam in!");
+    return;
+  }
+
   if (!selectedCoffee) {
     alert("Kies eerst een koffie ☕");
     return;
@@ -133,6 +162,7 @@ window.placeOrder = function() {
   const sugar = document.getElementById("sugar")?.checked || false;
 
   push(ref(db, "orders"), {
+    name: customerName,
     coffee: selectedCoffee,
     milk: milk,
     sugar: sugar,
@@ -140,7 +170,7 @@ window.placeOrder = function() {
     status: "nieuw"
   });
 
-  alert("Bestelling geplaatst!");
+  alert(`Bestelling geplaatst, ${customerName}!`);
   location.reload();
-}
+};
 </script>
