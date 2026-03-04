@@ -76,7 +76,7 @@ function initMenu() {
     const img = document.createElement("img");
     img.src = coffee.img; // gebruik pad of URL
     img.style.width = "100%";
-	img.style.height = "150px";   // hier voeg je de hoogte toe
+	img.style.height = "200px";   // hier voeg je de hoogte toe
 	img.style.objectFit = "cover"; // voor mooie bijsnijding
     img.style.borderRadius = "10px";
     img.style.marginBottom = "10px";
@@ -158,8 +158,8 @@ document.getElementById("order-btn").addEventListener("click", () => {
   push(ref(db, "orders"), {
     name: customerName,
     coffee: selectedCoffee,
-    milk: milk,
-    sugar: sugar,
+    milk: document.getElementById("milk")?.checked || false,
+	sugar: document.getElementById("sugar")?.checked || false,
     time: new Date().toLocaleTimeString(),
     status: "nieuw"
   });
