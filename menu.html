@@ -56,6 +56,33 @@ h1,h2 { text-align:center; color:#3e2723; }
     height: 160px;
   }
 }
+
+/* 🎯 Mooie bestelknop */
+#order-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #6d4c41, #8d6e63);
+  color: white;
+
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+}
+
+#order-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+#order-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
 </style>
 </head>
 <body>
@@ -70,7 +97,7 @@ h1,h2 { text-align:center; color:#3e2723; }
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
   <div id="options"></div>
-  <button id="order-btn">Bestelling bevestigen</button>
+  <button id="order-btn">☕ Bestelling plaatsen</button>
 </div>
 
 <script type="module">
@@ -140,6 +167,14 @@ function initMenu() {
 function showOptions(coffeeName) {
   optionsDiv.innerHTML = "";
 
+  const sugarIcon = `
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="#6d4c41">
+      <rect x="3" y="8" width="8" height="8" rx="2"/>
+      <rect x="9" y="4" width="8" height="8" rx="2"/>
+      <rect x="13" y="10" width="8" height="8" rx="2"/>
+    </svg>
+  `;
+
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
     optionsDiv.innerHTML = `
       <label>
@@ -148,14 +183,14 @@ function showOptions(coffeeName) {
       </label>
       <label>
         <input type="checkbox" id="sugar">
-        🍬 Suiker
+        ${sugarIcon} Suiker
       </label>
     `;
   } else if (coffeeName.includes("Latte")) {
     optionsDiv.innerHTML = `
       <label>
         <input type="checkbox" id="sugar">
-        🍬 Suiker
+        ${sugarIcon} Suiker
       </label>
     `;
   }
