@@ -196,7 +196,7 @@
 
     let selectedCoffee = null;
 
-     function initMenu() {
+   function initMenu() {
   const menuDiv = document.getElementById("menu-screen");
   menuDiv.innerHTML = "";  // Maak het menu leeg
 
@@ -222,18 +222,20 @@
         div.appendChild(span);
 
         div.onclick = () => {
+          // Verwijder selectie van andere producten
           document.querySelectorAll(".card").forEach(c => {
             c.classList.remove("selected");
             const oldOptions = c.querySelector(".card-options");
             if (oldOptions) oldOptions.remove();
           });
 
+          // Markeer het geselecteerde product
           div.classList.add("selected");
           selectedCoffee = product.name;
           showOptions(div, product.name);
-		  
-		   // Maak de bestelknop zichtbaar wanneer een product wordt geselecteerd
-          showOrderButton();
+
+          // Maak de bestelknop zichtbaar wanneer een product is geselecteerd
+          document.getElementById("order-btn").style.display = "block";
         };
 
         menuDiv.appendChild(div);  // Voeg het product toe aan het menu
@@ -243,91 +245,33 @@
 }
 
 // Functie om de bestelknop zichtbaar te maken
-function showOrderButton() {
-  const orderButton = document.getElementById("order-btn");
-  if (orderButton) {
-    orderButton.style.display = "block";  // Maak de knop zichtbaar
+document.getElementById("order-btn").onclick = () => {
+  if (!selectedCoffee) {
+    alert("Selecteer eerst een koffie");
+    return;
   }
-}
 
-    function showOptions(cardElement, coffeeName) {
-      const optionsDiv = document.createElement("div");
-      optionsDiv.className = "card-options";
+  const selectedCard = document.querySelector(".card.selected");
+  if (!selectedCard) return;
 
-      const sugarIcon = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5">
-          <rect x="3" y="8" width="8" height="8" rx="2"/>
-          <rect x="9" y="4" width="8" height="8" rx="2"/>
-          <rect x="13" y="10" width="8" height="8" rx="2"/>
-        </svg>
-      `;
+  const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
+  const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
 
-      if (coffeeName === "Espresso" || coffeeName === "Lungo") {
-        optionsDiv.innerHTML = `
-          <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
-          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-        `;
-      } else if (coffeeName.includes("Latte Macchiato")) {
-        optionsDiv.innerHTML = `
-          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-        `;
-      }
+  const order = {
+    name: localStorage.getItem("customerName"),
+    coffee: selectedCoffee,
+    milk: milk,
+    sugar: sugar,
+    time: new Date().toLocaleTimeString()
+  };
 
-      // Stop bubbelen zodat checkboxes werken
-      optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
-        cb.addEventListener("click", (e) => e.stopPropagation());
-      });
+  // Push de bestelling naar Firebase
+  push(ref(db, "orders"), order);
+  alert("Bestelling geplaatst! ✅");
 
-      cardElement.appendChild(optionsDiv);
-
-      setTimeout(() => {
-        cardElement.classList.add("selected");
-      }, 10);
-    }
-
-    // Naam invoer scherm
-    document.getElementById("next-btn").onclick = () => {
-      const nameInput = document.getElementById("customer-name").value.trim();
-      if (!nameInput) {
-        alert("Vul eerst je naam in!");
-        return;
-      }
-      localStorage.setItem("customerName", nameInput);
-      document.getElementById("name-screen").style.display = "none";
-      document.getElementById("menu-screen").style.display = "block";
-      initMenu();
-    };
-
-    // Bestelknop
-    document.getElementById("order-btn").onclick = () => {
-      if (!selectedCoffee) {
-        alert("Selecteer eerst een koffie");
-        return;
-      }
-
-      const selectedCard = document.querySelector(".card.selected");
-      if (!selectedCard) return;
-
-      const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
-      const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
-
-      const order = {
-        name: localStorage.getItem("customerName"),
-        coffee: selectedCoffee,
-        milk: milk,
-        sugar: sugar,
-        time: new Date().toLocaleTimeString()
-      };
-
-      push(ref(db, "orders"), order);
-      alert("Bestelling geplaatst! ✅");
-	  
-	    // Verberg de bestelknop na het plaatsen van de bestelling
-  const orderButton = document.getElementById("order-btn");
-  if (orderButton) {
-    orderButton.style.display = "none";  // Verberg de knop
-  }
-    };
+  // Verberg de bestelknop na het plaatsen van de bestelling
+  document.getElementById("order-btn").style.display = "none";  // Verberg de knop
+};
   </script>
 </head>
 <body>
