@@ -163,26 +163,26 @@
       }
     }
   </style>
+
   <!-- Firebase -->
   <script type="module">
-    // Firebase config
- import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-  authDomain: "koffie-bestellen.firebaseapp.com",
-  databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "koffie-bestellen",
-  storageBucket: "koffie-bestellen.firebasestorage.app",
-  messagingSenderId: "592791423506",
-  appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+      authDomain: "koffie-bestellen.firebaseapp.com",
+      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "koffie-bestellen",
+      storageBucket: "koffie-bestellen.firebasestorage.app",
+      messagingSenderId: "592791423506",
+      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Coffies
+    // Coffees
     const coffees = [
       { name: "Espresso", img: "espresso.jpg" },
       { name: "Long Black", img: "longblack.jpg" },
@@ -190,102 +190,60 @@
       { name: "Latte Macchiato Pumpkin Spice", img: "pumpkinspice.jpg" },
       { name: "Latte Macchiato Vanille", img: "vanille.jpg" },
       { name: "Latte Macchiato Caramel", img: "caramel.jpg" },
-	  { name: "Ijskoffie", img: "ijskoffie.jpg" },
-	  { name: "Thee", img: "thee.jpg" }
+      { name: "Ijskoffie", img: "ijskoffie.jpg" },
+      { name: "Thee", img: "thee.jpg" }
     ];
 
     let selectedCoffee = null;
 
-   function initMenu() {
-  const menuDiv = document.getElementById("menu-screen");
-  menuDiv.innerHTML = "";  // Maak het menu leeg
+    function initMenu() {
+      const menuDiv = document.getElementById("menu-screen");
+      menuDiv.innerHTML = "";  // Maak het menu leeg
 
-  selectedCoffee = null;
+      selectedCoffee = null;
 
-  // Haal de producten uit Firebase
-  const productsRef = ref(db, "products");
-  onValue(productsRef, (snapshot) => {
-    snapshot.forEach((childSnapshot) => {
-      const product = childSnapshot.val();
+      // Haal de producten uit Firebase
+      const productsRef = ref(db, "products");
+      onValue(productsRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const product = childSnapshot.val();
 
-      // Alleen beschikbare producten weergeven
-      if (product.available) {
-        const div = document.createElement("div");
-        div.className = "card";
+          // Alleen beschikbare producten weergeven
+          if (product.available) {
+            const div = document.createElement("div");
+            div.className = "card";
 
-        const img = document.createElement("img");
-        img.src = product.img;  // Voeg afbeelding toe
-        div.appendChild(img);
+            const img = document.createElement("img");
+            img.src = product.img;  // Voeg afbeelding toe
+            div.appendChild(img);
 
-        const span = document.createElement("span");
-        span.textContent = product.name;  // Voeg productnaam toe
-        div.appendChild(span);
+            const span = document.createElement("span");
+            span.textContent = product.name;  // Voeg productnaam toe
+            div.appendChild(span);
 
-        div.onclick = () => {
-          // Verwijder selectie van andere producten
-          document.querySelectorAll(".card").forEach(c => {
-            c.classList.remove("selected");
-            const oldOptions = c.querySelector(".card-options");
-            if (oldOptions) oldOptions.remove();
-          });
+            div.onclick = () => {
+              document.querySelectorAll(".card").forEach(c => {
+                c.classList.remove("selected");
+                const oldOptions = c.querySelector(".card-options");
+                if (oldOptions) oldOptions.remove();
+              });
 
-          // Markeer het geselecteerde product
-          div.classList.add("selected");
-          selectedCoffee = product.name;
-          showOptions(div, product.name);
+              div.classList.add("selected");
+              selectedCoffee = product.name;
+              showOptions(div, product.name);
+              
+              // Maak de bestelknop zichtbaar wanneer een product wordt geselecteerd
+              showOrderButton();
+            };
 
-          // Maak de bestelknop zichtbaar wanneer een product is geselecteerd
-          document.getElementById("order-btn").style.display = "block";
-        };
+            menuDiv.appendChild(div);  // Voeg het product toe aan het menu
+          }
+        });
+      });
+    }
 
-        menuDiv.appendChild(div);  // Voeg het product toe aan het menu
-      }
-    });
-  });
-}
-
-// Functie om de bestelknop zichtbaar te maken
-document.getElementById("order-btn").onclick = () => {
-  if (!selectedCoffee) {
-    alert("Selecteer eerst een koffie");
-    return;
-  }
-
-  const selectedCard = document.querySelector(".card.selected");
-  if (!selectedCard) return;
-
-  const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
-  const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
-
-  const order = {
-    name: localStorage.getItem("customerName"),
-    coffee: selectedCoffee,
-    milk: milk,
-    sugar: sugar,
-    time: new Date().toLocaleTimeString()
-  };
-
-  // Push de bestelling naar Firebase
-  push(ref(db, "orders"), order);
-  alert("Bestelling geplaatst! ✅");
-
-  // Verberg de bestelknop na het plaatsen van de bestelling
-  document.getElementById("order-btn").style.display = "none";  // Verberg de knop
-};
-  </script>
-</head>
-<body>
-  <!-- Naam scherm -->
-  <div id="name-screen">
-    <h2>Vul je naam in</h2>
-    <input type="text" id="customer-name" placeholder="Naam">
-    <button id="next-btn">Volgende</button>
-  </div>
-
-  <!-- Menu scherm -->
-  <div id="menu-screen" style="display:none;">
-    <!-- Menu wordt hier dynamisch geladen -->
-    <<button id="order-btn" style="display:none;">☕ Bestelling plaatsen</button>
-  </div>
-</body>
-</html>
+    // Functie om de bestelknop zichtbaar te maken
+    function showOrderButton() {
+      const orderButton = document.getElementById("order-btn");
+      if (orderButton) {
+        orderButton.style.display = "block";
