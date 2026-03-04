@@ -73,7 +73,7 @@
   <!-- Firebase config en import -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, onValue, update, query, orderByKey } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     // Firebase configuratie
     const firebaseConfig = {
@@ -122,6 +122,9 @@
     // Realtime bestellingen ophalen
     const ordersRef = ref(db, "orders");
     const orderList = document.getElementById("order-list");
+
+// Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
+    const ordersQuery = query(ordersRef, orderByKey());
 
     onValue(ordersRef, (snapshot) => {
       orderList.innerHTML = "";
