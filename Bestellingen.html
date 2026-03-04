@@ -124,7 +124,7 @@
     const orderList = document.getElementById("order-list");
 
     // Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
-    const ordersQuery = query(ordersRef, orderByChild('time'));
+    const ordersQuery = query(ordersRef, orderByChild('timestamp'));
 
     onValue(ordersQuery, (snapshot) => {
       orderList.innerHTML = "";
