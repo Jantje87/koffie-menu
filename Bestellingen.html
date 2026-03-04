@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -119,24 +119,32 @@
       });
     });
 
-    // Realtime bestellingen ophalen (met omgekeerde volgorde)
-const ordersRef = ref(db, "orders");
-const orderList = document.getElementById("order-list");
+    // Realtime bestellingen ophalen (gesorteerd op timestamp)
+    const ordersRef = ref(db, "orders");
+    const orderList = document.getElementById("order-list");
 
-    // Query om bestellingen in omgekeerde volgorde op te halen (nieuwe bovenaan)
+    // Query om bestellingen op timestamp te sorteren (nieuwste bovenaan)
     const ordersQuery = query(ordersRef, orderByChild('timestamp'));
 
     onValue(ordersQuery, (snapshot) => {
       orderList.innerHTML = "";
+      let orders = [];
+      
       snapshot.forEach(childSnapshot => {
         const order = childSnapshot.val();
-        const orderKey = childSnapshot.key;
+        orders.push(order);
+      });
 
+      // Sorteer de bestellingen op timestamp (nieuwste bovenaan)
+      orders.reverse();  // Omgekeerde volgorde (nieuwste bovenaan)
+
+      // Maak de bestellingen dynamisch
+      orders.forEach(order => {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
 
         const orderDetails = document.createElement("span");
-        orderDetails.textContent = `${order.name} bestelde een ${order.coffee} om ${order.time}`;
+        orderDetails.textContent = `${order.name} bestelde een ${order.coffee} om ${new Date(order.timestamp).toLocaleTimeString()}`;
         orderDiv.appendChild(orderDetails);
 
         const orderDetailDiv = document.createElement("div");
@@ -150,7 +158,7 @@ const orderList = document.getElementById("order-list");
         completeButton.textContent = order.completed ? "Voltooid" : "Markeer als Voltooid";
         completeButton.onclick = () => {
           // Update de status van de bestelling naar 'voltooid'
-          update(ref(db, `orders/${orderKey}`), { completed: true });
+          update(ref(db, `orders/${childSnapshot.key}`), { completed: true });
         };
 
         // Voeg de knop toe aan de bestelling
