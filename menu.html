@@ -28,16 +28,17 @@ button { width:100%; padding:15px; background:#6d4c41; color:white; border:none;
   <h1>☕ Koffie Menu</h1>
   <div class="container" id="menu"></div>
   <div id="options"></div>
-  <button onclick="placeOrder()">Bestelling bevestigen</button>
+  <button id="order-btn">Bestelling bevestigen</button>
+  <button id="change-name-btn" style="margin-top:10px; background:#a1887f;">Andere naam invullen</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// --- Firebase config ---
+// --- Firebase config invullen ---
 const firebaseConfig = {
-   apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+  apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
   authDomain: "koffie-bestellen.firebaseapp.com",
   databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "koffie-bestellen"
@@ -74,17 +75,14 @@ function initMenu() {
     const div = document.createElement("div");
     div.className = "card";
 
-    // Afbeelding
     const img = document.createElement("img");
-    img.src = coffee.img; // pad of URL
+    img.src = coffee.img; // of URL
     div.appendChild(img);
 
-    // Naam
     const span = document.createElement("span");
     span.textContent = coffee.name;
     div.appendChild(span);
 
-    // Klik selectie
     div.onclick = () => {
       document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
       div.classList.add("selected");
@@ -99,7 +97,6 @@ function initMenu() {
 // --- Functie: opties tonen ---
 function showOptions(coffeeName) {
   optionsDiv.innerHTML = "";
-
   if (coffeeName === "Espresso" || coffeeName === "Long Black") {
     optionsDiv.innerHTML += `
       <label><input type="checkbox" id="milk"> Melk</label>
@@ -132,15 +129,21 @@ document.getElementById("name-next-btn").addEventListener("click", () => {
   initMenu();
 });
 
-
+// --- Naam wijzigen ---
+document.getElementById("change-name-btn").addEventListener("click", () => {
+  localStorage.removeItem("customerName");
+  location.reload();
+});
 
 // --- Bestelling plaatsen ---
-window.placeOrder = function() {
+document.getElementById("order-btn").addEventListener("click", () => {
   if (!customerName) { alert("Vul eerst je naam in!"); return; }
   if (!selectedCoffee) { alert("Kies eerst een koffie ☕"); return; }
 
   const milk = document.getElementById("milk")?.checked || false;
   const sugar = document.getElementById("sugar")?.checked || false;
+
+  console.log("Plaats bestelling:", customerName, selectedCoffee, milk, sugar);
 
   push(ref(db, "orders"), {
     name: customerName,
@@ -149,10 +152,12 @@ window.placeOrder = function() {
     sugar: sugar,
     time: new Date().toLocaleTimeString(),
     status: "nieuw"
-  });
-
-  alert(`Bestelling geplaatst, ${customerName}!`);
-  location.reload();
+  })
+  .then(() => {
+    alert(`Bestelling geplaatst, ${customerName}!`);
+    location.reload();
+  })
+  .catch((err) => alert("Fout bij plaatsen bestelling: " + err));
 });
 </script>
 
