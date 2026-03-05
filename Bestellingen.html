@@ -1,194 +1,425 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin - Bestellingen en Producten</title>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
+    :root{
+      --bg: #f6f4f2;
+      --card: #ffffff;
+      --text: #2b2b2b;
+      --muted: #6b6b6b;
+      --border: #e7e2de;
+
+      --brand: #6d4c41;
+      --brandHover: #8d6e63;
+
+      --ok: #1f8a4c;
+      --okHover: #17723f;
+
+      --shadow: 0 10px 24px rgba(0,0,0,0.08);
+      --radius: 16px;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body{
       margin: 0;
-      padding: 20px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    h1 {
-      text-align: center;
-      color: #6d4c41;
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
     }
 
-    .product-list, .order-list {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    }
-
-    .product, .order {
+    header{
       display: flex;
+      align-items: flex-end;
       justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #ccc;
+      gap: 12px;
+      margin: 6px 0 18px;
     }
 
-    .order span, .product span {
-      font-size: 16px;
+    h1{
+      margin: 0;
+      color: var(--brand);
+      font-size: 26px;
+      letter-spacing: 0.2px;
     }
 
-    .toggle-btn {
-      padding: 8px 16px;
-      background: #6d4c41;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .toggle-btn:hover {
-      background: #8d6e63;
-    }
-
-    .order-detail {
+    .subtitle{
+      margin: 0 0 2px 0;
+      color: var(--muted);
       font-size: 14px;
-      color: #555;
     }
 
-    .order-list h2, .product-list h2 {
-      text-align: center;
-      color: #6d4c41;
+    /* Grid layout: 2 kolommen op desktop, 1 op mobiel */
+    .grid{
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 16px;
+      align-items: start;
     }
 
-    .order-btn {
-      background: #4CAF50;  /* Groen voor Voltooid */
+    .panel{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    .order-btn:hover {
-      background: #45a049;
+    .panel-head{
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .panel-title{
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--brand);
+      letter-spacing: 0.2px;
+    }
+
+    .panel-body{
+      padding: 12px;
+    }
+
+    /* List items */
+    .item{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+    .item:last-child{ margin-bottom: 0; }
+
+    /* Product item layout */
+    .product-row{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .name{
+      font-weight: 600;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    /* Order item layout */
+    .order-top{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .order-main{
+      font-weight: 650;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .time{
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .chips{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: #4b4b4b;
+      background: #faf8f7;
+      white-space: nowrap;
+    }
+
+    .chip.on{
+      border-color: rgba(31,138,76,0.35);
+      background: rgba(31,138,76,0.08);
+      color: var(--ok);
+      font-weight: 600;
+    }
+
+    .chip.off{
+      border-color: rgba(109,76,65,0.25);
+      background: rgba(109,76,65,0.06);
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn{
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+      transition: transform .03s ease, background .15s ease, opacity .15s ease;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn-brand{
+      background: var(--brand);
+      color: #fff;
+    }
+    .btn-brand:hover{ background: var(--brandHover); }
+
+    .btn-ok{
+      background: var(--ok);
+      color: #fff;
+    }
+    .btn-ok:hover{ background: var(--okHover); }
+
+    .btn-ghost{
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* Completed state (optioneel visueel) */
+    .is-completed{
+      opacity: 0.78;
+    }
+
+    .is-completed .order-main{
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba(0,0,0,0.18);
+    }
+
+    /* Small helper for empty states (als je later wil toevoegen) */
+    .muted{
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (max-width: 520px){
+      .container{ padding: 14px; }
+      h1{ font-size: 22px; }
+
+      .panel-body{ padding: 10px; }
+      .item{ padding: 11px; }
+
+      /* Knoppen full-width op mobiel waar logisch */
+      .product-row{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .product-row .btn{ width: 100%; }
+
+      .order-top{
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .time{ white-space: normal; }
+      .order-actions .btn{ width: 100%; }
+    }
+
+    .order-actions{
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
     }
   </style>
 
-  <!-- Firebase config en import -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getDatabase, ref, onValue, update, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Firebase configuratie
     const firebaseConfig = {
-       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-       authDomain: "koffie-bestellen.firebaseapp.com",
-       databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-       projectId: "koffie-bestellen",
-       storageBucket: "koffie-bestellen.firebasestorage.app",
-       messagingSenderId: "592791423506",
-       appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+      apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+      authDomain: "koffie-bestellen.firebaseapp.com",
+      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "koffie-bestellen",
+      storageBucket: "koffie-bestellen.firebasestorage.app",
+      messagingSenderId: "592791423506",
+      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Realtime producten beheren
+    // Producten
     const productsRef = ref(db, "products");
     const productList = document.getElementById("product-list");
 
     onValue(productsRef, (snapshot) => {
       productList.innerHTML = "";
+
       snapshot.forEach(childSnapshot => {
         const product = childSnapshot.val();
         const productKey = childSnapshot.key;
 
-        const productDiv = document.createElement("div");
-        productDiv.className = "product";
+        const item = document.createElement("div");
+        item.className = "item";
 
-        const productName = document.createElement("span");
-        productName.textContent = product.name;
-        productDiv.appendChild(productName);
+        const row = document.createElement("div");
+        row.className = "product-row";
 
-        const toggleButton = document.createElement("button");
-        toggleButton.className = "toggle-btn";
-        toggleButton.textContent = product.available ? "Verwijder" : "Herstel";
-        toggleButton.onclick = () => {
-          const available = !product.available;
-          update(ref(db, `products/${productKey}`), { available });
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = product.name;
+
+        const btn = document.createElement("button");
+        btn.className = "btn btn-brand";
+        btn.textContent = product.available ? "Verwijder" : "Herstel";
+        btn.onclick = () => {
+          update(ref(db, `products/${productKey}`), { available: !product.available });
         };
 
-        productDiv.appendChild(toggleButton);
-        productList.appendChild(productDiv);
+        row.appendChild(name);
+        row.appendChild(btn);
+
+        item.appendChild(row);
+        productList.appendChild(item);
       });
     });
 
-    // Realtime bestellingen ophalen (gesorteerd op timestamp)
+    // Bestellingen (nieuwste bovenaan)
     const ordersRef = ref(db, "orders");
     const orderList = document.getElementById("order-list");
-
-    // Query om bestellingen op timestamp te sorteren (nieuwste bovenaan)
-    const ordersQuery = query(ordersRef, orderByChild('timestamp'));
+    const ordersQuery = query(ordersRef, orderByChild("timestamp"));
 
     onValue(ordersQuery, (snapshot) => {
-  orderList.innerHTML = "";
-  let orders = [];
+      orderList.innerHTML = "";
+      let orders = [];
 
-  snapshot.forEach(childSnapshot => {
-    const order = childSnapshot.val();
-    orders.push({
-      ...order,
-      key: childSnapshot.key // Voeg de key toe aan het orderobject
+      snapshot.forEach(childSnapshot => {
+        orders.push({ ...childSnapshot.val(), key: childSnapshot.key });
+      });
+
+      orders.reverse();
+
+      orders.forEach(order => {
+        const item = document.createElement("div");
+        item.className = "item";
+        if (order.completed) item.classList.add("is-completed");
+
+        // Top line: "Naam bestelde ..." + tijd rechts
+        const top = document.createElement("div");
+        top.className = "order-top";
+
+        const main = document.createElement("div");
+        main.className = "order-main";
+        main.textContent = `${order.name} — ${order.coffee}`;
+
+        const time = document.createElement("div");
+        time.className = "time";
+        time.textContent = new Date(order.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+        top.appendChild(main);
+        top.appendChild(time);
+
+        // Chips
+        const chips = document.createElement("div");
+        chips.className = "chips";
+
+        const milk = document.createElement("span");
+        milk.className = "chip " + (order.milk ? "on" : "off");
+        milk.textContent = order.milk ? "Melk: Ja" : "Melk: Nee";
+
+        const sugar = document.createElement("span");
+        sugar.className = "chip " + (order.sugar ? "on" : "off");
+        sugar.textContent = order.sugar ? "Suiker: Ja" : "Suiker: Nee";
+
+        chips.appendChild(milk);
+        chips.appendChild(sugar);
+
+        // Action button(s)
+        const actions = document.createElement("div");
+        actions.className = "order-actions";
+
+        const completeBtn = document.createElement("button");
+        completeBtn.className = "btn btn-ok";
+        completeBtn.textContent = order.completed ? "Voltooid" : "Markeer als voltooid";
+        completeBtn.disabled = !!order.completed;
+        completeBtn.style.opacity = order.completed ? "0.7" : "1";
+        completeBtn.onclick = () => {
+          update(ref(db, `orders/${order.key}`), { completed: true });
+        };
+
+        actions.appendChild(completeBtn);
+
+        item.appendChild(top);
+        item.appendChild(chips);
+        item.appendChild(actions);
+
+        orderList.appendChild(item);
+      });
     });
-  });
-
-  // Sorteer de bestellingen op timestamp (nieuwste bovenaan)
-  orders.reverse();  // Omgekeerde volgorde (nieuwste bovenaan)
-
-  orders.forEach(order => {
-    const orderDiv = document.createElement("div");
-    orderDiv.className = "order";
-
-    const orderDetails = document.createElement("span");
-    orderDetails.textContent = `${order.name} bestelde een ${order.coffee} om ${new Date(order.timestamp).toLocaleTimeString()}`;
-    orderDiv.appendChild(orderDetails);
-
-    const orderDetailDiv = document.createElement("div");
-    orderDetailDiv.className = "order-detail";
-    orderDetailDiv.textContent = `Melk: ${order.milk ? "Ja" : "Nee"}, Suiker: ${order.sugar ? "Ja" : "Nee"}`;
-    orderDiv.appendChild(orderDetailDiv);
-
-    // Knop om bestelling als voltooid te markeren
-    const completeButton = document.createElement("button");
-    completeButton.className = "toggle-btn order-btn";
-    completeButton.textContent = order.completed ? "Voltooid" : "Markeer als Voltooid";
-    completeButton.onclick = () => {
-      // Gebruik de key uit het order object
-      update(ref(db, `orders/${order.key}`), { completed: true });
-    };
-
-    // Voeg de knop toe aan de bestelling
-    orderDiv.appendChild(completeButton);
-    orderList.appendChild(orderDiv);
-  });
-});
-
   </script>
 </head>
+
 <body>
-  <h1>Admin Paneel</h1>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Admin Paneel</h1>
+        <p class="subtitle">Beheer producten en verwerk bestellingen — werkt netjes op mobiel & desktop.</p>
+      </div>
+    </header>
 
-  <!-- Producten beheren -->
-  <div class="product-list">
-    <h2>Producten</h2>
-    <div id="product-list">
-      <!-- Producten worden hier geladen -->
+    <div class="grid">
+      <!-- Producten -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">Producten</h2>
+        </div>
+        <div class="panel-body">
+          <div id="product-list"></div>
+        </div>
+      </section>
+
+      <!-- Bestellingen -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">Bestellingen</h2>
+        </div>
+        <div class="panel-body">
+          <div id="order-list"></div>
+        </div>
+      </section>
     </div>
   </div>
-
-  <!-- Bestellingen bekijken -->
-  <div class="order-list">
-    <h2>Bestellingen</h2>
-    <div id="order-list">
-      <!-- Bestellingen worden hier geladen -->
-    </div>
-  </div>
-
 </body>
 </html>
