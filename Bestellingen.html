@@ -263,6 +263,15 @@
       text-decoration-color: rgba(0,0,0,0.18);
     }
 
+.btn-danger{
+  background:#d32f2f;
+  color:white;
+}
+
+.btn-danger:hover{
+  background:#b71c1c;
+}
+
     /* Bonus: new-order highlight */
     .is-new{
       border-color: rgba(255, 193, 7, 0.55);
@@ -301,6 +310,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getDatabase, ref, onValue, update, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+	import { remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
@@ -533,6 +543,24 @@
       } else {
         if (newCount > 0) beep();
       }
+	  const clearBtn = document.getElementById("clear-orders-btn");
+
+clearBtn.onclick = () => {
+
+  const confirmed = confirm("Weet je zeker dat je ALLE bestellingen wilt verwijderen?");
+
+  if(!confirmed) return;
+
+  remove(ref(db, "orders"))
+    .then(() => {
+      alert("Alle bestellingen zijn gewist.");
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Er ging iets mis bij het verwijderen.");
+    });
+
+};
     });
   </script>
 </head>
@@ -570,10 +598,13 @@
       </section>
 
       <!-- Bestellingen -->
-      <section class="panel">
-        <div class="panel-head">
-          <h2 class="panel-title">Bestellingen</h2>
-        </div>
+      <div class="panel-head">
+  <h2 class="panel-title">Bestellingen</h2>
+
+  <button id="clear-orders-btn" class="btn btn-danger">
+    Wis alle bestellingen
+  </button>
+</div>
         <div class="panel-body">
           <div id="order-list"></div>
         </div>
