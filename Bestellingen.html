@@ -55,12 +55,33 @@
     }
 
     .subtitle{
-      margin: 0 0 2px 0;
+      margin: 6px 0 0 0;
       color: var(--muted);
       font-size: 14px;
     }
 
-    /* Grid layout: 2 kolommen op desktop, 1 op mobiel */
+    .controls{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.7);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+      user-select: none;
+    }
+    .toggle input{ transform: translateY(1px); }
+
+    /* Grid layout */
     .grid{
       display: grid;
       grid-template-columns: 1fr 1.2fr;
@@ -88,7 +109,7 @@
     .panel-title{
       margin: 0;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--brand);
       letter-spacing: 0.2px;
     }
@@ -97,7 +118,7 @@
       padding: 12px;
     }
 
-    /* List items */
+    /* Items */
     .item{
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -109,34 +130,64 @@
     }
     .item:last-child{ margin-bottom: 0; }
 
-    /* Product item layout */
+    /* Product row */
     .product-row{
-      display: flex;
-      align-items: center;
+      display:flex;
+      align-items:center;
       justify-content: space-between;
       gap: 12px;
-      min-width: 0;
+      min-width:0;
+    }
+
+    .product-left{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width:0;
     }
 
     .name{
-      font-weight: 600;
-      min-width: 0;
-      overflow-wrap: anywhere;
-    }
-
-    /* Order item layout */
-    .order-top{
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .order-main{
       font-weight: 650;
       min-width: 0;
       overflow-wrap: anywhere;
+    }
+
+    .product-img{
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      flex: 0 0 auto;
+    }
+
+    /* Order layout */
+    .order-top{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      min-width:0;
+    }
+
+    .order-main{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .order-img{
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      flex: 0 0 auto;
     }
 
     .time{
@@ -166,14 +217,21 @@
       border-color: rgba(31,138,76,0.35);
       background: rgba(31,138,76,0.08);
       color: var(--ok);
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .chip.off{
       border-color: rgba(109,76,65,0.25);
       background: rgba(109,76,65,0.06);
       color: var(--brand);
-      font-weight: 600;
+      font-weight: 700;
+    }
+
+    .order-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap: wrap;
     }
 
     /* Buttons */
@@ -183,7 +241,7 @@
       cursor: pointer;
       padding: 10px 12px;
       border-radius: 12px;
-      font-weight: 650;
+      font-weight: 750;
       letter-spacing: 0.2px;
       transition: transform .03s ease, background .15s ease, opacity .15s ease;
       user-select: none;
@@ -191,74 +249,52 @@
     }
     .btn:active{ transform: translateY(1px); }
 
-    .btn-brand{
-      background: var(--brand);
-      color: #fff;
-    }
+    .btn-brand{ background: var(--brand); color: #fff; }
     .btn-brand:hover{ background: var(--brandHover); }
 
-    .btn-ok{
-      background: var(--ok);
-      color: #fff;
-    }
+    .btn-ok{ background: var(--ok); color: #fff; }
     .btn-ok:hover{ background: var(--okHover); }
 
-    .btn-ghost{
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    /* Completed state (optioneel visueel) */
-    .is-completed{
-      opacity: 0.78;
-    }
-
+    /* Completed (optioneel visueel) */
+    .is-completed{ opacity: 0.78; }
     .is-completed .order-main{
       text-decoration: line-through;
       text-decoration-thickness: 2px;
       text-decoration-color: rgba(0,0,0,0.18);
     }
 
-    /* Small helper for empty states (als je later wil toevoegen) */
-    .muted{
-      color: var(--muted);
-      font-size: 14px;
+    /* Bonus: new-order highlight */
+    .is-new{
+      border-color: rgba(255, 193, 7, 0.55);
+      background: rgba(255, 193, 7, 0.10);
+      animation: popGlow 1.2s ease-out 1;
+    }
+    @keyframes popGlow{
+      0%{ transform: scale(0.995); box-shadow: 0 0 0 rgba(0,0,0,0); }
+      40%{ transform: scale(1.01); box-shadow: 0 18px 30px rgba(0,0,0,0.10); }
+      100%{ transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
     }
 
     /* Responsive */
     @media (max-width: 900px){
       .grid{ grid-template-columns: 1fr; }
       header{ align-items: flex-start; flex-direction: column; }
+      .controls{ justify-content: flex-start; }
     }
 
     @media (max-width: 520px){
       .container{ padding: 14px; }
       h1{ font-size: 22px; }
-
       .panel-body{ padding: 10px; }
       .item{ padding: 11px; }
 
-      /* Knoppen full-width op mobiel waar logisch */
-      .product-row{
-        flex-direction: column;
-        align-items: stretch;
-      }
+      /* Buttons full-width op mobiel waar logisch */
+      .product-row{ flex-direction: column; align-items: stretch; }
       .product-row .btn{ width: 100%; }
 
-      .order-top{
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .order-top{ flex-direction: column; align-items: flex-start; }
       .time{ white-space: normal; }
       .order-actions .btn{ width: 100%; }
-    }
-
-    .order-actions{
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
     }
   </style>
 
@@ -279,35 +315,109 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Producten
-    const productsRef = ref(db, "products");
+    // --- Bonus instellingen ---
+    let highlightNewOrders = true;     // highlight aan/uit
+    let soundEnabled = true;           // geluid aan/uit
+
+    // Houd bij welke orders we al gezien hebben
+    const seenOrderKeys = new Set();
+
+    // Optie 4b: coffee-name => product.img
+    let productImages = {}; // { "Cappuccino": "https://..." }
+
+    function beep() {
+      if (!soundEnabled) return;
+      try {
+        // Simpele "ding" via Web Audio
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.value = 880; // toonhoogte
+        g.gain.value = 0.0001;
+
+        o.connect(g);
+        g.connect(ctx.destination);
+
+        const t = ctx.currentTime;
+        o.start(t);
+        g.gain.exponentialRampToValueAtTime(0.15, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+        o.stop(t + 0.20);
+
+        // cleanup
+        o.onended = () => ctx.close().catch(()=>{});
+      } catch (e) {
+        // Als browser audio blokkeert, doen we gewoon niets.
+      }
+    }
+
+    function makeImg(className, src, alt) {
+      const img = document.createElement("img");
+      img.className = className;
+      img.src = src || "";
+      img.alt = alt || "";
+      img.loading = "lazy";
+      img.onerror = () => { img.style.display = "none"; };
+      if (!src) img.style.display = "none";
+      return img;
+    }
+
+    // DOM refs
     const productList = document.getElementById("product-list");
+    const orderList = document.getElementById("order-list");
+    const highlightToggle = document.getElementById("toggle-highlight");
+    const soundToggle = document.getElementById("toggle-sound");
+
+    // Koppel toggles
+    highlightToggle.addEventListener("change", (e) => {
+      highlightNewOrders = !!e.target.checked;
+    });
+    soundToggle.addEventListener("change", (e) => {
+      soundEnabled = !!e.target.checked;
+    });
+
+    // --- Producten ---
+    const productsRef = ref(db, "products");
 
     onValue(productsRef, (snapshot) => {
       productList.innerHTML = "";
+      productImages = {}; // reset lookup
 
       snapshot.forEach(childSnapshot => {
         const product = childSnapshot.val();
         const productKey = childSnapshot.key;
 
+        // Map voor orders (optie 4b)
+        if (product?.name) {
+          productImages[product.name] = product.img || "";
+        }
+
+        // Render product card
         const item = document.createElement("div");
         item.className = "item";
 
         const row = document.createElement("div");
         row.className = "product-row";
 
+        const left = document.createElement("div");
+        left.className = "product-left";
+
+        const img = makeImg("product-img", product.img, product.name);
+
         const name = document.createElement("div");
         name.className = "name";
-        name.textContent = product.name;
+        name.textContent = product.name || "(naamloos product)";
+
+        left.appendChild(img);
+        left.appendChild(name);
 
         const btn = document.createElement("button");
         btn.className = "btn btn-brand";
         btn.textContent = product.available ? "Verwijder" : "Herstel";
-        btn.onclick = () => {
-          update(ref(db, `products/${productKey}`), { available: !product.available });
-        };
+        btn.onclick = () => update(ref(db, `products/${productKey}`), { available: !product.available });
 
-        row.appendChild(name);
+        row.appendChild(left);
         row.appendChild(btn);
 
         item.appendChild(row);
@@ -315,42 +425,71 @@
       });
     });
 
-    // Bestellingen (nieuwste bovenaan)
+    // --- Bestellingen (nieuwste bovenaan) ---
     const ordersRef = ref(db, "orders");
-    const orderList = document.getElementById("order-list");
     const ordersQuery = query(ordersRef, orderByChild("timestamp"));
 
     onValue(ordersQuery, (snapshot) => {
       orderList.innerHTML = "";
-      let orders = [];
+      const orders = [];
 
       snapshot.forEach(childSnapshot => {
         orders.push({ ...childSnapshot.val(), key: childSnapshot.key });
       });
 
-      orders.reverse();
+      orders.reverse(); // newest first
+
+      // Detecteer nieuw (alleen bij updates na de eerste load)
+      let newCount = 0;
 
       orders.forEach(order => {
+        const isNew = !seenOrderKeys.has(order.key);
+        // Mark as seen (we doen dit meteen zodat duplicate triggers voorkomen worden)
+        seenOrderKeys.add(order.key);
+
+        // Render order item
         const item = document.createElement("div");
         item.className = "item";
         if (order.completed) item.classList.add("is-completed");
 
-        // Top line: "Naam bestelde ..." + tijd rechts
+        // highlight alleen voor nieuwe én niet-voltooide (meestal handig)
+        const shouldHighlight = highlightNewOrders && isNew && !order.completed;
+        if (shouldHighlight) {
+          item.classList.add("is-new");
+          newCount += 1;
+          // highlight na een paar seconden weghalen (optioneel)
+          setTimeout(() => item.classList.remove("is-new"), 6000);
+        }
+
+        // top row
         const top = document.createElement("div");
         top.className = "order-top";
 
         const main = document.createElement("div");
         main.className = "order-main";
-        main.textContent = `${order.name} — ${order.coffee}`;
+
+        // Optie 4b: haal img via productImages op basis van order.coffee
+        const imgUrl = productImages[order.coffee] || "";
+        const img = makeImg("order-img", imgUrl, order.coffee || "Product");
+
+        const text = document.createElement("span");
+        text.textContent = `${order.name || "Onbekend"} — ${order.coffee || "Onbekend product"}`;
+
+        main.appendChild(img);
+        main.appendChild(text);
 
         const time = document.createElement("div");
         time.className = "time";
-        time.textContent = new Date(order.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        if (order.timestamp) {
+          time.textContent = new Date(order.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        } else {
+          time.textContent = "";
+        }
 
         top.appendChild(main);
         top.appendChild(time);
 
-        // Chips
+        // chips
         const chips = document.createElement("div");
         chips.className = "chips";
 
@@ -365,7 +504,7 @@
         chips.appendChild(milk);
         chips.appendChild(sugar);
 
-        // Action button(s)
+        // actions
         const actions = document.createElement("div");
         actions.className = "order-actions";
 
@@ -374,9 +513,7 @@
         completeBtn.textContent = order.completed ? "Voltooid" : "Markeer als voltooid";
         completeBtn.disabled = !!order.completed;
         completeBtn.style.opacity = order.completed ? "0.7" : "1";
-        completeBtn.onclick = () => {
-          update(ref(db, `orders/${order.key}`), { completed: true });
-        };
+        completeBtn.onclick = () => update(ref(db, `orders/${order.key}`), { completed: true });
 
         actions.appendChild(completeBtn);
 
@@ -386,6 +523,16 @@
 
         orderList.appendChild(item);
       });
+
+      // Bonus: geluid als er nieuwe orders binnenkomen (na eerste load)
+      // We willen niet "piepen" bij de allereerste initial load van bestaande orders.
+      // Daarom: als seenOrderKeys al gevuld was vóór deze run, piepen we voor newCount > 0.
+      // Eenvoudige aanpak: onthoud of we al een eerste run hebben gehad.
+      if (!window.__ordersInitialized) {
+        window.__ordersInitialized = true;
+      } else {
+        if (newCount > 0) beep();
+      }
     });
   </script>
 </head>
@@ -395,7 +542,19 @@
     <header>
       <div>
         <h1>Admin Paneel</h1>
-        <p class="subtitle">Beheer producten en verwerk bestellingen — werkt netjes op mobiel & desktop.</p>
+        <p class="subtitle">Producten met afbeeldingen + bestellingen met automatische productafbeelding (via <code>products[name].img</code>).</p>
+      </div>
+
+      <div class="controls">
+        <label class="toggle" title="Laat nieuwe bestellingen kort oplichten">
+          <input id="toggle-highlight" type="checkbox" checked />
+          Nieuwe bestellingen highlight
+        </label>
+
+        <label class="toggle" title="Speel een kort geluid af bij nieuwe bestellingen">
+          <input id="toggle-sound" type="checkbox" checked />
+          Geluid bij nieuwe bestelling
+        </label>
       </div>
     </header>
 
