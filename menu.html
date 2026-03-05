@@ -1,377 +1,274 @@
-<!DOCTYPE html>
-<html lang="nl">
+<style>
+  :root{
+    --bg: #f6f1ec;
+    --panel: rgba(255,255,255,0.78);
+    --card: #ffffff;
+    --text: #2b2b2b;
+    --muted: #6f6a66;
+    --border: #e9dfd7;
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Koffie Menu</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 0;
-    }
+    --brand: #6d4c41;
+    --brand2: #8d6e63;
 
-    /* Naam scherm */
-    #name-screen {
-      max-width: 400px;
-      margin: 50px auto;
-      text-align: center;
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    }
+    --caramel: #c98a3a;
+    --caramelSoft: rgba(201,138,58,0.14);
 
-    #name-screen input {
-      width: 80%;
-      padding: 10px;
-      margin: 15px 0;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
+    --shadow: 0 14px 34px rgba(0,0,0,0.08);
+    --shadow2: 0 10px 20px rgba(0,0,0,0.06);
+    --radius: 18px;
+  }
 
-    #name-screen button {
-      padding: 12px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #6d4c41, #8d6e63);
-      color: white;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-      transition: all 0.25s ease;
-    }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(1200px 800px at 15% 0%, rgba(255,255,255,0.9), rgba(255,255,255,0) 55%),
+      radial-gradient(1000px 700px at 90% 10%, rgba(255,246,235,0.9), rgba(255,255,255,0) 60%),
+      var(--bg);
+    color: var(--text);
+  }
 
-    #name-screen button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
+  /* Naam scherm */
+  #name-screen{
+    width: min(420px, 92vw);
+    margin: 34px auto;
+    text-align: center;
+    background: var(--panel);
+    backdrop-filter: blur(8px);
+    padding: 26px 22px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
 
-    #name-screen button:active {
-      transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    }
+  #name-screen h2{
+    margin: 0 0 8px;
+    color: var(--brand);
+    letter-spacing: .2px;
+  }
 
-    /* Menu scherm */
-    #menu-screen {
-      max-width: 600px;
-      margin: 20px auto;
-      padding-top: 20px;
-    }
+  #name-screen p{
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 14px;
+  }
 
-    .card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      background: white;
-      border-radius: 15px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: 0.2s;
-      position: relative;
-    }
+  #name-screen input{
+    width: 100%;
+    padding: 12px 14px;
+    margin: 12px 0 14px;
+    font-size: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    outline: none;
+    background: rgba(255,255,255,0.9);
+  }
+  #name-screen input:focus{
+    border-color: rgba(201,138,58,0.55);
+    box-shadow: 0 0 0 4px rgba(201,138,58,0.12);
+  }
 
-    .card:hover {
-      transform: scale(1.02);
-    }
+  .btn{
+    border: none;
+    cursor: pointer;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-weight: 750;
+    letter-spacing: .2px;
+    transition: transform .05s ease, box-shadow .2s ease, opacity .2s ease;
+    user-select:none;
+  }
+  .btn:active{ transform: translateY(1px); }
 
-    .card img{
-  width:140px;
-  height:140px;
-  object-fit:contain;
-}
+  .btn-primary{
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand), var(--brand2));
+    color: #fff;
+    box-shadow: 0 10px 18px rgba(109,76,65,0.25);
+  }
+  .btn-primary:hover{ box-shadow: 0 14px 24px rgba(109,76,65,0.30); }
 
-    .card span {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 600;
-    }
+  .btn-ghost{
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
 
-    .card-options {
-      max-height: 0;
-      overflow: hidden;
-      padding-top: 0;
-      border-top: 1px solid #eee;
-      transition: max-height 0.5s ease-out, padding-top 0.5s ease-out;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-    }
+  /* Menu layout */
+  #menu-screen{
+    width: min(960px, 96vw);
+    margin: 18px auto 90px;
+    padding: 10px;
+  }
 
-    .card.selected .card-options {
-      max-height: 200px;
-      padding-top: 10px;
-    }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 6px 0 12px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow2);
+  }
 
-    .card-options label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 15px;
-      cursor: pointer;
-    }
+  .who{
+    display:flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .who .label{ font-size: 12px; color: var(--muted); }
+  .who .name{ font-size: 15px; font-weight: 800; color: var(--brand); }
 
-    .card-options input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-    }
+  /* Grid (matcht menu-icons) */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
 
-    /* Bestelknop */
-    .order-btn {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: 600;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #6d4c41, #8d6e63);
-      color: white;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-      transition: all 0.25s ease;
-      margin-top: 15px;
-      display: none;
-    }
+  .card{
+    background: rgba(255,255,255,0.88);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow2);
+    padding: 14px;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .order-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
+  .card::after{
+    content:"";
+    position:absolute;
+    inset:-30px;
+    background: radial-gradient(400px 220px at 50% -10%, rgba(201,138,58,0.18), rgba(255,255,255,0));
+    opacity:0;
+    transition: opacity .18s ease;
+    pointer-events:none;
+  }
 
-    .order-btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    }
+  .card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 16px 26px rgba(0,0,0,0.08);
+  }
+  .card:hover::after{ opacity: 1; }
 
-    /* Responsive design voor mobiel */
-    @media (max-width: 600px) {
-      .card {
-        flex-direction: column;
-        text-align: center;
-        padding: 10px;
-      }
+  .card.selected{
+    border-color: rgba(201,138,58,0.75);
+    box-shadow: 0 18px 30px rgba(201,138,58,0.16);
+  }
 
-      .card img {
-        width: 100%;
-        height: auto;
-        max-width: 150px;
-      }
+  .card img{
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    border-radius: 16px;
+    background: transparent;
+  }
 
-      #name-screen {
-        width: 90%;
-        margin: 20px auto;
-      }
+  .card span{
+    text-align: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.15;
+  }
 
-      #menu-screen {
-        padding: 10px;
-      }
+  /* Options */
+  .card-options{
+    width: 100%;
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(233,223,215,0.9);
+    margin-top: 4px;
+  }
 
-      .order-btn {
-        font-size: 16px;
-      }
-    }
-  </style>
+  .opt{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.75);
+    font-size: 14px;
+    color: var(--text);
+    user-select:none;
+  }
 
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+  .opt input{
+    width: 18px;
+    height: 18px;
+    accent-color: var(--caramel);
+  }
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-      authDomain: "koffie-bestellen.firebaseapp.com",
-      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "koffie-bestellen",
-      storageBucket: "koffie-bestellen.firebasestorage.app",
-      messagingSenderId: "592791423506",
-      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
-    };
+  /* Sticky order bar (mobiel fijn) */
+  .sticky-order{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px;
+    background: rgba(246,241,236,0.75);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -12px 30px rgba(0,0,0,0.08);
+    display:none;
+  }
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  .sticky-inner{
+    width: min(960px, 96vw);
+    margin: 0 auto;
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    justify-content: space-between;
+  }
 
-    let selectedCoffee = null;
+  .sticky-label{
+    font-weight: 800;
+    color: var(--brand);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 55%;
+  }
 
-    // Initialiseer het menu
-    function initMenu() {
-      const menuDiv = document.getElementById("menu-screen");
-      menuDiv.innerHTML = "";
-      selectedCoffee = null;
+  .order-btn{
+    display:none; /* we gebruiken sticky button */
+  }
 
-      const productsRef = ref(db, "products");
-      onValue(productsRef, (snapshot) => {
-        menuDiv.innerHTML = ""; // belangrijk: voorkom duplicaten bij realtime updates
+  .btn-order{
+    background: linear-gradient(135deg, var(--caramel), #e0a24b);
+    color: white;
+    box-shadow: 0 14px 24px rgba(201,138,58,0.22);
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-weight: 850;
+    white-space: nowrap;
+  }
 
-        snapshot.forEach((childSnapshot) => {
-          const product = childSnapshot.val();
-
-          if (product.available) {
-            const div = document.createElement("div");
-            div.className = "card";
-
-            const img = document.createElement("img");
-            img.src = product.img;
-            img.alt = product.name || "Product";
-            div.appendChild(img);
-
-            const span = document.createElement("span");
-            span.textContent = product.name;
-            div.appendChild(span);
-
-            div.onclick = () => {
-              document.querySelectorAll(".card").forEach(c => {
-                c.classList.remove("selected");
-                const oldOptions = c.querySelector(".card-options");
-                if (oldOptions) oldOptions.remove();
-                const oldButton = c.querySelector(".order-btn");
-                if (oldButton) oldButton.remove();
-              });
-
-              div.classList.add("selected");
-              selectedCoffee = product.name;
-              showOptions(div, product.name);
-
-              const orderButton = document.createElement("button");
-              orderButton.className = "order-btn";
-              orderButton.textContent = "☕ Bestelling plaatsen";
-              orderButton.style.display = "block";
-              orderButton.onclick = (e) => {
-                e.stopPropagation();
-                placeOrder(product.name);
-              };
-              div.appendChild(orderButton);
-            };
-
-            menuDiv.appendChild(div);
-          }
-        });
-      });
-    }
-
-    function showOptions(cardElement, coffeeName) {
-      const optionsDiv = document.createElement("div");
-      optionsDiv.className = "card-options";
-
-      const sugarIcon = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5">
-          <rect x="3" y="8" width="8" height="8" rx="2"/>
-          <rect x="9" y="4" width="8" height="8" rx="2"/>
-          <rect x="13" y="10" width="8" height="8" rx="2"/>
-        </svg>
-      `;
-
-      if (coffeeName === "Espresso" || coffeeName === "Lungo") {
-        optionsDiv.innerHTML = `
-          <label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
-          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-        `;
-      } else if (coffeeName.includes("Latte Macchiato")) {
-        optionsDiv.innerHTML = `
-          <label><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-        `;
-      }
-
-      optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
-        cb.addEventListener("click", (e) => e.stopPropagation());
-      });
-
-      cardElement.appendChild(optionsDiv);
-    }
-
-    function placeOrder(coffeeName) {
-      const selectedCard = document.querySelector(".card.selected");
-      const milk = selectedCard?.querySelector(".milk-checkbox")?.checked || false;
-      const sugar = selectedCard?.querySelector(".sugar-checkbox")?.checked || false;
-
-      const customerName = localStorage.getItem("customerName") || "";
-
-      if (!customerName) {
-        alert("Je naam is niet gevonden. Vul je naam opnieuw in.");
-        // Terug naar naamscherm
-        document.getElementById("menu-screen").style.display = "none";
-        document.getElementById("name-screen").style.display = "block";
-        return;
-      }
-
-      const order = {
-        name: customerName,
-        coffee: coffeeName,
-        milk,
-        sugar,
-        time: new Date().toLocaleTimeString(),
-        timestamp: Date.now()
-      };
-
-      push(ref(db, "orders"), order);
-      alert("Bestelling geplaatst! ✅");
-
-      const orderButton = selectedCard?.querySelector(".order-btn");
-      if (orderButton) orderButton.style.display = "none";
-    }
-
-    // ✅ FIX: pas starten als DOM klaar is + naam uit localStorage terugzetten
-    window.addEventListener("DOMContentLoaded", () => {
-      const nameScreen = document.getElementById("name-screen");
-      const menuScreen = document.getElementById("menu-screen");
-      const nameInputEl = document.getElementById("customer-name");
-      const nextBtn = document.getElementById("next-btn");
-
-      // Als er al een naam is opgeslagen → skip naamscherm
-      const savedName = localStorage.getItem("customerName");
-      if (savedName && savedName.trim()) {
-        nameScreen.style.display = "none";
-        menuScreen.style.display = "block";
-        initMenu();
-      } else {
-        // anders: toon naamscherm + focus input
-        nameScreen.style.display = "block";
-        menuScreen.style.display = "none";
-        nameInputEl.value = "";
-        nameInputEl.focus();
-      }
-
-      // Klik op Volgende
-      nextBtn.addEventListener("click", () => {
-        const nameInput = nameInputEl.value.trim();
-        if (!nameInput) {
-          alert("Vul eerst je naam in!");
-          return;
-        }
-
-        localStorage.setItem("customerName", nameInput);
-        nameScreen.style.display = "none";
-        menuScreen.style.display = "block";
-        initMenu();
-      });
-
-      // Enter in het inputveld doet ook "Volgende"
-      nameInputEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") nextBtn.click();
-      });
-    });
-  </script>
-
-</head>
-
-<body>
-  <!-- Naam scherm -->
-  <div id="name-screen">
-    <h2>Vul je naam in</h2>
-    <input type="text" id="customer-name" placeholder="Naam">
-    <button id="next-btn">Volgende</button>
-  </div>
-
-  <!-- Menu scherm -->
-  <div id="menu-screen" style="display:none;">
-    <!-- Menu wordt hier dynamisch geladen -->
-  </div>
-</body>
-
-</html>
+  /* Responsive */
+  @media (max-width: 980px){
+    .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 720px){
+    .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card img{ width: 132px; height: 132px; }
+  }
+  @media (max-width: 420px){
+    .card img{ width: 120px; height: 120px; }
+  }
+</style>
