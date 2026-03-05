@@ -201,27 +201,16 @@
 
     let selectedCoffee = null;
 
-    const coffees = [
-      { name: "Espresso", img: "espresso.jpg" },
-      { name: "Long Black", img: "longblack.jpg" },
-      { name: "Latte Macchiato", img: "latte.jpg" },
-      { name: "Latte Macchiato Pumpkin Spice", img: "pumpkinspice.jpg" },
-      { name: "Latte Macchiato Vanille", img: "vanille.jpg" },
-      { name: "Latte Macchiato Caramel", img: "caramel.jpg" },
-      { name: "Ijskoffie", img: "ijskoffie.jpg" },
-      { name: "Thee", img: "thee.jpg" }
-    ];
-
     // Initialiseer het menu
     function initMenu() {
       const menuDiv = document.getElementById("menu-screen");
-      menuDiv.innerHTML = "";  // Maak het menu leeg
-
+      menuDiv.innerHTML = "";
       selectedCoffee = null;
 
-      // Haal producten uit Firebase
       const productsRef = ref(db, "products");
       onValue(productsRef, (snapshot) => {
+        menuDiv.innerHTML = ""; // belangrijk: voorkom duplicaten bij realtime updates
+
         snapshot.forEach((childSnapshot) => {
           const product = childSnapshot.val();
 
@@ -231,6 +220,7 @@
 
             const img = document.createElement("img");
             img.src = product.img;
+            img.alt = product.name || "Product";
             div.appendChild(img);
 
             const span = document.createElement("span");
@@ -243,19 +233,21 @@
                 const oldOptions = c.querySelector(".card-options");
                 if (oldOptions) oldOptions.remove();
                 const oldButton = c.querySelector(".order-btn");
-                if (oldButton) oldButton.remove(); // Verwijder de bestelknop van het vorige product
+                if (oldButton) oldButton.remove();
               });
 
               div.classList.add("selected");
               selectedCoffee = product.name;
               showOptions(div, product.name);
 
-              // Voeg de bestelknop toe aan het geselecteerde product
               const orderButton = document.createElement("button");
               orderButton.className = "order-btn";
               orderButton.textContent = "☕ Bestelling plaatsen";
               orderButton.style.display = "block";
-              orderButton.onclick = () => placeOrder(product.name);
+              orderButton.onclick = (e) => {
+                e.stopPropagation();
+                placeOrder(product.name);
+              };
               div.appendChild(orderButton);
             };
 
@@ -265,7 +257,6 @@
       });
     }
 
-    // Functie om de bestelknop zichtbaar te maken
     function showOptions(cardElement, coffeeName) {
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "card-options";
@@ -296,41 +287,77 @@
       cardElement.appendChild(optionsDiv);
     }
 
-    // Bestelling plaatsen
     function placeOrder(coffeeName) {
       const selectedCard = document.querySelector(".card.selected");
-      const milk = selectedCard.querySelector(".milk-checkbox")?.checked || false;
-      const sugar = selectedCard.querySelector(".sugar-checkbox")?.checked || false;
+      const milk = selectedCard?.querySelector(".milk-checkbox")?.checked || false;
+      const sugar = selectedCard?.querySelector(".sugar-checkbox")?.checked || false;
+
+      const customerName = localStorage.getItem("customerName") || "";
+
+      if (!customerName) {
+        alert("Je naam is niet gevonden. Vul je naam opnieuw in.");
+        // Terug naar naamscherm
+        document.getElementById("menu-screen").style.display = "none";
+        document.getElementById("name-screen").style.display = "block";
+        return;
+      }
 
       const order = {
-        name: localStorage.getItem("customerName"),
+        name: customerName,
         coffee: coffeeName,
-        milk: milk,
-        sugar: sugar,
+        milk,
+        sugar,
         time: new Date().toLocaleTimeString(),
-		timestamp: Date.now()
+        timestamp: Date.now()
       };
 
       push(ref(db, "orders"), order);
       alert("Bestelling geplaatst! ✅");
 
-      // Verberg de bestelknop na het plaatsen van de bestelling
-      const orderButton = selectedCard.querySelector(".order-btn");
+      const orderButton = selectedCard?.querySelector(".order-btn");
       if (orderButton) orderButton.style.display = "none";
     }
 
-    // Naam invoer scherm
-    document.getElementById("next-btn").onclick = () => {
-      const nameInput = document.getElementById("customer-name").value.trim();
-      if (!nameInput) {
-        alert("Vul eerst je naam in!");
-        return;
+    // ✅ FIX: pas starten als DOM klaar is + naam uit localStorage terugzetten
+    window.addEventListener("DOMContentLoaded", () => {
+      const nameScreen = document.getElementById("name-screen");
+      const menuScreen = document.getElementById("menu-screen");
+      const nameInputEl = document.getElementById("customer-name");
+      const nextBtn = document.getElementById("next-btn");
+
+      // Als er al een naam is opgeslagen → skip naamscherm
+      const savedName = localStorage.getItem("customerName");
+      if (savedName && savedName.trim()) {
+        nameScreen.style.display = "none";
+        menuScreen.style.display = "block";
+        initMenu();
+      } else {
+        // anders: toon naamscherm + focus input
+        nameScreen.style.display = "block";
+        menuScreen.style.display = "none";
+        nameInputEl.value = "";
+        nameInputEl.focus();
       }
-      localStorage.setItem("customerName", nameInput);
-      document.getElementById("name-screen").style.display = "none";
-      document.getElementById("menu-screen").style.display = "block";
-      initMenu();
-    };
+
+      // Klik op Volgende
+      nextBtn.addEventListener("click", () => {
+        const nameInput = nameInputEl.value.trim();
+        if (!nameInput) {
+          alert("Vul eerst je naam in!");
+          return;
+        }
+
+        localStorage.setItem("customerName", nameInput);
+        nameScreen.style.display = "none";
+        menuScreen.style.display = "block";
+        initMenu();
+      });
+
+      // Enter in het inputveld doet ook "Volgende"
+      nameInputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") nextBtn.click();
+      });
+    });
   </script>
 
 </head>
