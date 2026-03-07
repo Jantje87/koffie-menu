@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
 
 <meta charset="UTF-8">
@@ -19,7 +18,7 @@ margin:0;
 /* naam scherm */
 
 #name-screen{
-max-width:400px;
+max-width:420px;
 margin:60px auto;
 background:white;
 padding:30px;
@@ -30,7 +29,7 @@ box-shadow:0 8px 20px rgba(0,0,0,0.1);
 
 #name-screen input{
 width:80%;
-padding:10px;
+padding:12px;
 margin-top:15px;
 }
 
@@ -130,11 +129,8 @@ transform-origin:top;
 @keyframes pour{
 
 0%{height:0}
-
 40%{height:35px}
-
 80%{height:35px}
-
 100%{height:0}
 
 }
@@ -145,25 +141,10 @@ animation:fill 2s infinite;
 
 @keyframes fill{
 
-0%{
-height:0;
-y:120;
-}
-
-50%{
-height:12px;
-y:120;
-}
-
-80%{
-height:20px;
-y:112;
-}
-
-100%{
-height:0;
-y:120;
-}
+0%{height:0;y:120}
+50%{height:12px;y:120}
+80%{height:20px;y:112}
+100%{height:0;y:120}
 
 }
 
@@ -174,19 +155,9 @@ animation:steam 2s infinite;
 
 @keyframes steam{
 
-0%{
-opacity:0;
-transform:translateY(8px);
-}
-
-50%{
-opacity:0.7;
-}
-
-100%{
-opacity:0;
-transform:translateY(-8px);
-}
+0%{opacity:0;transform:translateY(8px)}
+50%{opacity:0.7}
+100%{opacity:0;transform:translateY(-8px)}
 
 }
 
@@ -200,8 +171,6 @@ font-size:50px;
 
 <body>
 
-<!-- naam invoer -->
-
 <div id="name-screen">
 
 <h2>Vul je naam in</h2>
@@ -214,15 +183,11 @@ font-size:50px;
 
 </div>
 
-<!-- menu -->
-
 <div id="menu-screen">
 
 <div class="grid" id="menu-grid"></div>
 
 </div>
-
-<!-- bestelknop -->
 
 <div class="sticky-order" id="sticky-order">
 
@@ -232,11 +197,9 @@ font-size:50px;
 
 </div>
 
-<!-- koffie status -->
-
 <div id="coffee-status">
 
-<div class="coffee-card">
+<div class="coffee-card" id="coffee-card">
 
 <h2 id="status-title">Je koffie wordt gezet...</h2>
 
@@ -245,7 +208,6 @@ font-size:50px;
 <svg viewBox="0 0 200 150">
 
 <rect x="30" y="20" width="140" height="60" rx="8" fill="#d8d8d8"/>
-
 <rect x="30" y="20" width="140" height="10" fill="#bdbdbd"/>
 
 <rect x="90" y="60" width="20" height="10" fill="#444"/>
@@ -285,11 +247,9 @@ ref,
 push,
 onValue
 }
-
 from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 const firebaseConfig={
-
 apiKey:"AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
 authDomain:"koffie-bestellen.firebaseapp.com",
 databaseURL:"https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
@@ -297,13 +257,59 @@ projectId:"koffie-bestellen",
 storageBucket:"koffie-bestellen.firebasestorage.app",
 messagingSenderId:"592791423506",
 appId:"1:592791423506:web:b4901c0cd2cf9094b9e6cb"
-
 };
 
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 
 let selectedCoffee=null;
+let activeOrderId=null;
+
+/* LOCATIE CHECK */
+
+const HOME_LAT = 52.123456;
+const HOME_LNG = 5.123456;
+const ALLOWED_RADIUS = 120;
+
+function distance(lat1,lon1,lat2,lon2){
+
+const R=6371000;
+
+const dLat=(lat2-lat1)*Math.PI/180;
+const dLon=(lon2-lon1)*Math.PI/180;
+
+const a=
+Math.sin(dLat/2)**2+
+Math.cos(lat1*Math.PI/180)*
+Math.cos(lat2*Math.PI/180)*
+Math.sin(dLon/2)**2;
+
+const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+
+return R*c;
+
+}
+
+function checkLocation(){
+
+return new Promise((resolve,reject)=>{
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+const d=distance(
+pos.coords.latitude,
+pos.coords.longitude,
+HOME_LAT,
+HOME_LNG
+);
+
+resolve(d<ALLOWED_RADIUS);
+
+},reject);
+
+});
+
+}
 
 /* menu laden */
 
@@ -359,13 +365,23 @@ grid.appendChild(card);
 
 /* bestelling */
 
-function placeOrder(){
+async function placeOrder(){
 
 if(!selectedCoffee) return;
 
+const allowed=await checkLocation();
+
+if(!allowed){
+
+alert("Bestellen kan alleen bij mij thuis.");
+
+return;
+
+}
+
 const name=localStorage.getItem("customerName");
 
-push(ref(db,"orders"),{
+const orderRef=push(ref(db,"orders"),{
 
 name:name,
 coffee:selectedCoffee,
@@ -376,11 +392,15 @@ timestamp:Date.now()
 
 });
 
+activeOrderId=orderRef.key;
+
+localStorage.setItem("activeOrderId",activeOrderId);
+
 showBrewing();
 
-}
+listenForCompletion(activeOrderId);
 
-/* animatie */
+}
 
 function showBrewing(){
 
@@ -388,19 +408,15 @@ document.getElementById("coffee-status").style.display="flex";
 
 }
 
-/* luisteren naar orders */
+function listenForCompletion(orderId){
 
-function listenOrders(){
+const orderRef=ref(db,"orders/"+orderId);
 
-const ordersRef=ref(db,"orders");
+onValue(orderRef,(snap)=>{
 
-onValue(ordersRef,(snapshot)=>{
+const order=snap.val();
 
-snapshot.forEach(child=>{
-
-const order=child.val();
-
-if(order.name===localStorage.getItem("customerName") && order.completed){
+if(order && order.completed){
 
 showReady();
 
@@ -408,24 +424,22 @@ showReady();
 
 });
 
-});
-
 }
 
 function showReady(){
 
-const card=document.querySelector(".coffee-card");
+const card=document.getElementById("coffee-card");
 
 card.innerHTML=`
-
 <div class="ready">✅</div>
 <h2>Je koffie is klaar!</h2>
-
 `;
 
 setTimeout(()=>{
 
 document.getElementById("coffee-status").style.display="none";
+
+localStorage.removeItem("activeOrderId");
 
 },3000);
 
@@ -443,7 +457,6 @@ document.getElementById("name-screen").style.display="none";
 document.getElementById("menu-screen").style.display="block";
 
 initMenu();
-listenOrders();
 
 }
 
@@ -457,7 +470,6 @@ document.getElementById("name-screen").style.display="none";
 document.getElementById("menu-screen").style.display="block";
 
 initMenu();
-listenOrders();
 
 };
 
