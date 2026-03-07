@@ -39,6 +39,7 @@ margin-top:15px;
 max-width:900px;
 margin:auto;
 padding:20px;
+padding-bottom:140px;
 display:none;
 }
 
@@ -76,8 +77,8 @@ left:0;
 right:0;
 background:white;
 padding:10px;
-display:none;
 box-shadow:0 -6px 12px rgba(0,0,0,0.1);
+display:none;
 }
 
 .btn-order{
@@ -111,18 +112,18 @@ background:white;
 padding:40px;
 border-radius:20px;
 text-align:center;
-width:340px;
+width:360px;
 }
 
-/* machine animatie */
-
 .machine{
-width:240px;
+width:260px;
 margin:auto;
 }
 
+/* espresso */
+
 .espresso-flow{
-animation:espressoPour 2.5s infinite;
+animation:espressoPour 3s infinite;
 transform-origin:top;
 }
 
@@ -131,46 +132,75 @@ animation-delay:.15s;
 }
 
 @keyframes espressoPour{
+
 0%{height:0}
-40%{height:42px}
-80%{height:42px}
+40%{height:48px}
+80%{height:48px}
 100%{height:0}
+
 }
 
+/* kopje vullen */
+
 .coffee-fill{
-animation:cupFill 2.5s infinite;
+animation:cupFill 3s infinite;
 }
 
 @keyframes cupFill{
-0%{height:0;y:160}
-50%{height:14px;y:160}
-80%{height:22px;y:152}
-100%{height:0;y:160}
+
+0%{height:0;y:175}
+50%{height:16px;y:175}
+80%{height:26px;y:165}
+100%{height:0;y:175}
+
 }
 
+/* crema */
+
 .crema-fill{
-animation:crema 2.5s infinite;
+animation:crema 3s infinite;
 }
 
 @keyframes crema{
-0%{height:0;y:158}
-50%{height:3px;y:158}
-80%{height:4px;y:156}
-100%{height:0;y:158}
+
+0%{height:0;y:173}
+50%{height:4px;y:173}
+80%{height:6px;y:169}
+100%{height:0;y:173}
+
 }
+
+/* stoom */
 
 .steam{
 opacity:0;
-animation:steamRise 2.5s infinite;
+animation:steamRise 3s infinite;
 }
 
 .s1{animation-delay:.5s}
 .s2{animation-delay:1s}
 
 @keyframes steamRise{
+
 0%{opacity:0;transform:translateY(10px)}
 50%{opacity:.7}
-100%{opacity:0;transform:translateY(-10px)}
+100%{opacity:0;transform:translateY(-12px)}
+
+}
+
+/* drukmeter */
+
+.gauge-needle{
+transform-origin:230px 75px;
+animation:gauge 3s infinite;
+}
+
+@keyframes gauge{
+
+0%{transform:rotate(-40deg)}
+50%{transform:rotate(30deg)}
+100%{transform:rotate(-40deg)}
+
 }
 
 .ready{
@@ -206,52 +236,53 @@ font-size:50px;
 
 <div class="coffee-card" id="coffee-card">
 
-<h2 id="status-title">Je koffie wordt gezet...</h2>
+<h2>Je koffie wordt gezet...</h2>
 
 <div class="machine">
 
-<svg viewBox="0 0 260 180">
+<svg viewBox="0 0 320 200">
 
-<!-- machine body -->
-<rect x="40" y="30" width="180" height="70" rx="8" fill="#d9d9d9"/>
-<rect x="40" y="30" width="180" height="12" fill="#bdbdbd"/>
+<rect x="40" y="30" width="240" height="90" rx="8" fill="#dcdcdc"/>
+<rect x="40" y="30" width="240" height="14" fill="#bfbfbf"/>
 
-<!-- grouphead -->
-<circle cx="130" cy="95" r="12" fill="#888"/>
-<rect x="122" y="90" width="16" height="16" fill="#666"/>
+<rect x="60" y="20" width="200" height="10" fill="#999"/>
 
-<!-- portafilter -->
-<rect x="105" y="106" width="50" height="8" rx="3" fill="#333"/>
+<circle cx="230" cy="75" r="18" fill="white" stroke="#444" stroke-width="3"/>
+<line class="gauge-needle"
+x1="230" y1="75" x2="230" y2="63"
+stroke="#c98a3a"
+stroke-width="3"/>
 
-<!-- dubbele spouts -->
-<rect x="118" y="114" width="6" height="8" fill="#444"/>
-<rect x="136" y="114" width="6" height="8" fill="#444"/>
+<circle cx="160" cy="100" r="16" fill="#888"/>
+<rect x="150" y="95" width="20" height="20" fill="#666"/>
 
-<!-- espresso -->
-<rect class="espresso-flow" x="120" y="122" width="4" height="0" fill="#4a250a"/>
-<rect class="espresso-flow right" x="138" y="122" width="4" height="0" fill="#4a250a"/>
+<rect x="135" y="118" width="50" height="8" rx="3" fill="#333"/>
 
-<!-- kopje -->
-<path d="M95 145 L165 145 L158 170 L102 170 Z"
+<rect x="175" y="120" width="50" height="6" rx="3" fill="#222"/>
+
+<rect x="148" y="126" width="6" height="8" fill="#444"/>
+<rect x="166" y="126" width="6" height="8" fill="#444"/>
+
+<rect class="espresso-flow" x="150" y="134" width="4" height="0" fill="#4a250a"/>
+<rect class="espresso-flow right" x="168" y="134" width="4" height="0" fill="#4a250a"/>
+
+<path d="M120 160 L200 160 L190 185 L130 185 Z"
 fill="white"
 stroke="#444"
 stroke-width="3"/>
 
-<!-- koffie -->
-<rect class="coffee-fill" x="102" y="160" width="56" height="0" fill="#5a2d0c"/>
+<rect class="coffee-fill" x="130" y="175" width="60" height="0" fill="#5a2d0c"/>
 
-<!-- crema -->
-<rect class="crema-fill" x="102" y="158" width="56" height="0" fill="#c98a3a"/>
+<rect class="crema-fill" x="130" y="173" width="60" height="0" fill="#c98a3a"/>
 
-<!-- stoom -->
 <path class="steam s1"
-d="M120 135 C110 120 130 120 125 100"
+d="M150 150 C140 135 160 135 155 115"
 stroke="#bbb"
 stroke-width="3"
 fill="none"/>
 
 <path class="steam s2"
-d="M140 135 C130 120 150 120 145 100"
+d="M175 150 C165 135 185 135 180 115"
 stroke="#bbb"
 stroke-width="3"
 fill="none"/>
@@ -338,17 +369,17 @@ const osc=ctx.createOscillator();
 const gain=ctx.createGain();
 
 osc.type="sawtooth";
-osc.frequency.value=120;
+osc.frequency.value=110;
 
 osc.connect(gain);
 gain.connect(ctx.destination);
 
 gain.gain.setValueAtTime(0.001,ctx.currentTime);
 gain.gain.exponentialRampToValueAtTime(0.15,ctx.currentTime+0.02);
-gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.2);
+gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+2);
 
 osc.start();
-osc.stop(ctx.currentTime+1.3);
+osc.stop(ctx.currentTime+2.1);
 
 }
 
@@ -422,17 +453,13 @@ timestamp:Date.now()
 });
 
 showBrewing();
-
 listenForCompletion(orderRef.key);
-
 playPumpSound();
 
 }
 
 function showBrewing(){
-
 document.getElementById("coffee-status").style.display="flex";
-
 }
 
 function listenForCompletion(id){
@@ -464,8 +491,6 @@ document.getElementById("coffee-status").style.display="none";
 },3000);
 
 }
-
-/* start */
 
 window.onload=()=>{
 
