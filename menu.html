@@ -31,7 +31,6 @@
         var(--bg);
     }
 
-    /* Naam scherm */
     #name-screen{
       max-width: 420px;
       margin: 40px auto;
@@ -62,7 +61,6 @@
       box-shadow: 0 0 0 3px rgba(201,138,58,0.12);
     }
 
-    /* Menu */
     #menu-screen{
       max-width: 950px;
       margin: 20px auto 120px auto;
@@ -117,7 +115,6 @@
       min-height: 38px;
     }
 
-    /* Opties */
     .card-options{
       margin-top: 12px;
       display: flex;
@@ -148,7 +145,6 @@
       cursor: pointer;
     }
 
-    /* Buttons */
     .btn{
       padding: 12px 18px;
       border: none;
@@ -177,7 +173,6 @@
       box-shadow: 0 10px 20px rgba(201,138,58,0.20);
     }
 
-    /* Sticky bestelbar */
     .sticky-order{
       position: fixed;
       bottom: 0;
@@ -198,8 +193,7 @@
       display: flex;
     }
 
-    /* Bevestiging */
-    #order-confirmation{
+    #coffee-status{
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.42);
@@ -210,7 +204,7 @@
       padding: 20px;
     }
 
-    .confirm-card{
+    .coffee-card{
       background: #fff;
       padding: 34px 28px;
       border-radius: 24px;
@@ -223,7 +217,7 @@
       overflow: hidden;
     }
 
-    .confirm-icon{
+    .coffee-icon{
       font-size: 52px;
       margin-bottom: 8px;
       position: relative;
@@ -255,18 +249,18 @@
     .steam span:nth-child(2){ left: 28px; animation-delay: .35s; }
     .steam span:nth-child(3){ left: 46px; animation-delay: .7s; }
 
-    .confirm-card h2{
+    .coffee-card h2{
       margin: 8px 0 8px;
       color: var(--brand);
     }
 
-    .confirm-card p{
+    .coffee-card p{
       margin: 0;
       color: var(--muted);
       line-height: 1.4;
     }
 
-    .confirm-ring{
+    .coffee-spinner{
       margin: 18px auto 0;
       width: 44px;
       height: 44px;
@@ -274,6 +268,11 @@
       border: 4px solid #f0e4d7;
       border-top-color: var(--accent);
       animation: spin 1s linear infinite;
+    }
+
+    .ready-icon{
+      font-size: 54px;
+      margin-bottom: 10px;
     }
 
     @keyframes pop{
@@ -291,14 +290,12 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Tablet */
     @media (max-width: 900px){
       .grid{
         grid-template-columns: repeat(3, 1fr);
       }
     }
 
-    /* Mobiel */
     @media (max-width: 600px){
       #menu-screen{
         margin-bottom: 120px;
@@ -344,7 +341,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, off } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
@@ -360,10 +357,12 @@
     const db = getDatabase(app);
 
     let selectedCoffee = null;
+    let activeOrderRef = null;
+    let activeOrderCallback = null;
+    let productsListenerAttached = false;
 
-    // Vul hier jouw thuislocatie in
-    const HOME_LAT = 53.25327032716371;
-    const HOME_LNG = 6.587397261441371;
+    const HOME_LAT = 52.123456;
+    const HOME_LNG = 5.123456;
     const ALLOWED_RADIUS_METERS = 100;
 
     function getDistance(lat1, lon1, lat2, lon2){
@@ -480,32 +479,88 @@
         osc.stop(ctx.currentTime + 0.35);
 
         osc.onended = () => ctx.close().catch(() => {});
-      } catch (e) {
-        // stil falen
-      }
+      } catch (e) {}
     }
 
-    function showConfirmation(coffee){
-      const confirmBox = document.getElementById("order-confirmation");
-      const confirmText = document.getElementById("confirm-text");
+    function showBrewingScreen(coffee){
+      const statusScreen = document.getElementById("coffee-status");
+      const iconWrap = document.getElementById("coffee-icon-wrap");
+      const title = document.getElementById("coffee-status-title");
+      const text = document.getElementById("coffee-status-text");
+      const spinner = document.getElementById("coffee-spinner");
 
-      confirmText.innerText = `${coffee} wordt voor je gemaakt`;
-      confirmBox.style.display = "flex";
+      iconWrap.innerHTML = `
+        <div class="coffee-icon">
+          ☕
+          <div class="steam" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      `;
+      title.innerText = "Je koffie wordt gezet...";
+      text.innerText = `${coffee} wordt voor je gemaakt`;
+      spinner.style.display = "block";
+      statusScreen.style.display = "flex";
+    }
+
+    function showReadyScreen(){
+      const statusScreen = document.getElementById("coffee-status");
+      const iconWrap = document.getElementById("coffee-icon-wrap");
+      const title = document.getElementById("coffee-status-title");
+      const text = document.getElementById("coffee-status-text");
+      const spinner = document.getElementById("coffee-spinner");
+
+      iconWrap.innerHTML = `<div class="ready-icon">✅</div>`;
+      title.innerText = "Je koffie is klaar!";
+      text.innerText = "Je kunt hem ophalen.";
+      spinner.style.display = "none";
+      statusScreen.style.display = "flex";
 
       playCoffeeSound();
 
       setTimeout(() => {
-        confirmBox.style.display = "none";
+        statusScreen.style.display = "none";
+        resetMenuAfterOrder();
+        localStorage.removeItem("activeOrderId");
+        detachActiveOrderListener();
+      }, 3000);
+    }
 
-        document.querySelectorAll(".card").forEach(c => {
-          c.classList.remove("selected");
-          c.querySelector(".card-options")?.remove();
-        });
+    function resetMenuAfterOrder(){
+      document.querySelectorAll(".card").forEach(c => {
+        c.classList.remove("selected");
+        c.querySelector(".card-options")?.remove();
+      });
 
-        selectedCoffee = null;
-        document.getElementById("sticky-order").style.display = "none";
-        document.getElementById("sticky-order-btn").innerHTML = "☕ Bestellen";
-      }, 2000);
+      selectedCoffee = null;
+      document.getElementById("sticky-order").style.display = "none";
+      document.getElementById("sticky-order-btn").innerHTML = "☕ Bestellen";
+    }
+
+    function detachActiveOrderListener(){
+      if (activeOrderRef && activeOrderCallback) {
+        off(activeOrderRef, "value", activeOrderCallback);
+      }
+      activeOrderRef = null;
+      activeOrderCallback = null;
+    }
+
+    function listenForOrderStatus(orderId){
+      detachActiveOrderListener();
+
+      activeOrderRef = ref(db, "orders/" + orderId);
+      activeOrderCallback = (snapshot) => {
+        const order = snapshot.val();
+        if (!order) return;
+
+        if (order.completed) {
+          showReadyScreen();
+        }
+      };
+
+      onValue(activeOrderRef, activeOrderCallback);
     }
 
     async function placeOrder(coffee){
@@ -534,14 +589,22 @@
         coffee,
         milk,
         sugar,
+        completed: false,
         timestamp: Date.now()
       };
 
-      await push(ref(db, "orders"), order);
-      showConfirmation(coffee);
+      const newOrderRef = await push(ref(db, "orders"), order);
+      localStorage.setItem("activeOrderId", newOrderRef.key);
+
+      resetMenuAfterOrder();
+      showBrewingScreen(coffee);
+      listenForOrderStatus(newOrderRef.key);
     }
 
     function initMenu(){
+      if (productsListenerAttached) return;
+      productsListenerAttached = true;
+
       const grid = document.getElementById("menu-grid");
       const productsRef = ref(db, "products");
 
@@ -597,11 +660,17 @@
 
     window.onload = () => {
       const savedName = localStorage.getItem("customerName");
+      const activeOrderId = localStorage.getItem("activeOrderId");
 
       if (savedName) {
         document.getElementById("name-screen").style.display = "none";
         document.getElementById("menu-screen").style.display = "block";
         initMenu();
+
+        if (activeOrderId) {
+          showBrewingScreen("Je bestelling");
+          listenForOrderStatus(activeOrderId);
+        }
       }
 
       document.getElementById("next-btn").onclick = () => {
@@ -616,6 +685,12 @@
         document.getElementById("name-screen").style.display = "none";
         document.getElementById("menu-screen").style.display = "block";
         initMenu();
+
+        const restoredOrderId = localStorage.getItem("activeOrderId");
+        if (restoredOrderId) {
+          showBrewingScreen("Je bestelling");
+          listenForOrderStatus(restoredOrderId);
+        }
       };
 
       document.getElementById("customer-name").addEventListener("keydown", (e) => {
@@ -645,19 +720,21 @@
     </div>
   </div>
 
-  <div id="order-confirmation">
-    <div class="confirm-card">
-      <div class="confirm-icon">
-        ☕
-        <div class="steam" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
+  <div id="coffee-status">
+    <div class="coffee-card">
+      <div id="coffee-icon-wrap">
+        <div class="coffee-icon">
+          ☕
+          <div class="steam" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
       </div>
-      <h2>Bestelling geplaatst!</h2>
-      <p id="confirm-text"></p>
-      <div class="confirm-ring" aria-hidden="true"></div>
+      <h2 id="coffee-status-title">Je koffie wordt gezet...</h2>
+      <p id="coffee-status-text"></p>
+      <div class="coffee-spinner" id="coffee-spinner"></div>
     </div>
   </div>
 </body>

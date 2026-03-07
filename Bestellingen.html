@@ -1,618 +1,243 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin - Bestellingen en Producten</title>
+<meta charset="UTF-8">
+<title>Koffie Dashboard</title>
 
-  <style>
-    :root{
-      --bg: #f6f4f2;
-      --card: #ffffff;
-      --text: #2b2b2b;
-      --muted: #6b6b6b;
-      --border: #e7e2de;
+<style>
 
-      --brand: #6d4c41;
-      --brandHover: #8d6e63;
-
-      --ok: #1f8a4c;
-      --okHover: #17723f;
-
-      --shadow: 0 10px 24px rgba(0,0,0,0.08);
-      --radius: 16px;
-    }
-
-    *{ box-sizing: border-box; }
-    html, body { height: 100%; }
-
-    body{
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .container{
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 18px;
-    }
-
-    header{
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 6px 0 18px;
-    }
-
-    h1{
-      margin: 0;
-      color: var(--brand);
-      font-size: 26px;
-      letter-spacing: 0.2px;
-    }
-
-    .subtitle{
-      margin: 6px 0 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .controls{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .toggle{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.7);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.04);
-      user-select: none;
-    }
-    .toggle input{ transform: translateY(1px); }
-
-    /* Grid layout */
-    .grid{
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .panel{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .panel-head{
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .panel-title{
-      margin: 0;
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--brand);
-      letter-spacing: 0.2px;
-    }
-
-    .panel-body{
-      padding: 12px;
-    }
-
-    /* Items */
-    .item{
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
-      display: grid;
-      gap: 10px;
-      margin-bottom: 10px;
-      background: #fff;
-    }
-    .item:last-child{ margin-bottom: 0; }
-
-    /* Product row */
-    .product-row{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      min-width:0;
-    }
-
-    .product-left{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width:0;
-    }
-
-    .name{
-      font-weight: 650;
-      min-width: 0;
-      overflow-wrap: anywhere;
-    }
-
-    .product-img{
-      width: 44px;
-      height: 44px;
-      object-fit: cover;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      flex: 0 0 auto;
-    }
-
-    /* Order layout */
-    .order-top{
-      display:flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-      min-width:0;
-    }
-
-    .order-main{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-
-    .order-img{
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      flex: 0 0 auto;
-    }
-
-    .time{
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-      flex: 0 0 auto;
-    }
-
-    .chips{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: #4b4b4b;
-      background: #faf8f7;
-      white-space: nowrap;
-    }
-
-    .chip.on{
-      border-color: rgba(31,138,76,0.35);
-      background: rgba(31,138,76,0.08);
-      color: var(--ok);
-      font-weight: 700;
-    }
-
-    .chip.off{
-      border-color: rgba(109,76,65,0.25);
-      background: rgba(109,76,65,0.06);
-      color: var(--brand);
-      font-weight: 700;
-    }
-
-    .order-actions{
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-      flex-wrap: wrap;
-    }
-
-    /* Buttons */
-    .btn{
-      appearance: none;
-      border: none;
-      cursor: pointer;
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-weight: 750;
-      letter-spacing: 0.2px;
-      transition: transform .03s ease, background .15s ease, opacity .15s ease;
-      user-select: none;
-      white-space: nowrap;
-    }
-    .btn:active{ transform: translateY(1px); }
-
-    .btn-brand{ background: var(--brand); color: #fff; }
-    .btn-brand:hover{ background: var(--brandHover); }
-
-    .btn-ok{ background: var(--ok); color: #fff; }
-    .btn-ok:hover{ background: var(--okHover); }
-
-    /* Completed (optioneel visueel) */
-    .is-completed{ opacity: 0.78; }
-    .is-completed .order-main{
-      text-decoration: line-through;
-      text-decoration-thickness: 2px;
-      text-decoration-color: rgba(0,0,0,0.18);
-    }
-
-.btn-danger{
-  background:#d32f2f;
-  color:white;
+body{
+font-family:Arial;
+background:#f6f1ec;
+margin:0;
+padding:20px;
 }
 
-.btn-danger:hover{
-  background:#b71c1c;
+h1{
+text-align:center;
+color:#6d4c41;
 }
 
-    /* Bonus: new-order highlight */
-    .is-new{
-      border-color: rgba(255, 193, 7, 0.55);
-      background: rgba(255, 193, 7, 0.10);
-      animation: popGlow 1.2s ease-out 1;
-    }
-    @keyframes popGlow{
-      0%{ transform: scale(0.995); box-shadow: 0 0 0 rgba(0,0,0,0); }
-      40%{ transform: scale(1.01); box-shadow: 0 18px 30px rgba(0,0,0,0.10); }
-      100%{ transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
-    }
+.order-list{
+max-width:900px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 8px 20px rgba(0,0,0,0.1);
+}
 
-    /* Responsive */
-    @media (max-width: 900px){
-      .grid{ grid-template-columns: 1fr; }
-      header{ align-items: flex-start; flex-direction: column; }
-      .controls{ justify-content: flex-start; }
-    }
+.order{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:12px;
+border-bottom:1px solid #eee;
+gap:10px;
+}
 
-    @media (max-width: 520px){
-      .container{ padding: 14px; }
-      h1{ font-size: 22px; }
-      .panel-body{ padding: 10px; }
-      .item{ padding: 11px; }
+.order img{
+width:60px;
+height:60px;
+object-fit:contain;
+}
 
-      /* Buttons full-width op mobiel waar logisch */
-      .product-row{ flex-direction: column; align-items: stretch; }
-      .product-row .btn{ width: 100%; }
+.order-info{
+flex:1;
+}
 
-      .order-top{ flex-direction: column; align-items: flex-start; }
-      .time{ white-space: normal; }
-      .order-actions .btn{ width: 100%; }
-    }
-  </style>
+.order-title{
+font-weight:bold;
+font-size:16px;
+}
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, onValue, update, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-	import { remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+.order-details{
+font-size:14px;
+color:#666;
+}
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-      authDomain: "koffie-bestellen.firebaseapp.com",
-      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "koffie-bestellen",
-      storageBucket: "koffie-bestellen.firebasestorage.app",
-      messagingSenderId: "592791423506",
-      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
-    };
+.order-status{
+font-size:13px;
+font-weight:bold;
+margin-top:3px;
+}
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+.pending{
+color:#c98a3a;
+}
 
-    // --- Bonus instellingen ---
-    let highlightNewOrders = true;     // highlight aan/uit
-    let soundEnabled = true;           // geluid aan/uit
+.done{
+color:#4CAF50;
+}
 
-    // Houd bij welke orders we al gezien hebben
-    const seenOrderKeys = new Set();
+button{
+padding:10px 16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
 
-    // Optie 4b: coffee-name => product.img
-    let productImages = {}; // { "Cappuccino": "https://..." }
+.complete-btn{
+background:#4CAF50;
+color:white;
+}
 
-    function beep() {
-      if (!soundEnabled) return;
-      try {
-        // Simpele "ding" via Web Audio
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = "sine";
-        o.frequency.value = 880; // toonhoogte
-        g.gain.value = 0.0001;
+.complete-btn:hover{
+background:#43a047;
+}
 
-        o.connect(g);
-        g.connect(ctx.destination);
+</style>
 
-        const t = ctx.currentTime;
-        o.start(t);
-        g.gain.exponentialRampToValueAtTime(0.15, t + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-        o.stop(t + 0.20);
+<script type="module">
 
-        // cleanup
-        o.onended = () => ctx.close().catch(()=>{});
-      } catch (e) {
-        // Als browser audio blokkeert, doen we gewoon niets.
-      }
-    }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, onValue, update, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    function makeImg(className, src, alt) {
-      const img = document.createElement("img");
-      img.className = className;
-      img.src = src || "";
-      img.alt = alt || "";
-      img.loading = "lazy";
-      img.onerror = () => { img.style.display = "none"; };
-      if (!src) img.style.display = "none";
-      return img;
-    }
+const firebaseConfig = {
 
-    // DOM refs
-    const productList = document.getElementById("product-list");
-    const orderList = document.getElementById("order-list");
-    const highlightToggle = document.getElementById("toggle-highlight");
-    const soundToggle = document.getElementById("toggle-sound");
-
-    // Koppel toggles
-    highlightToggle.addEventListener("change", (e) => {
-      highlightNewOrders = !!e.target.checked;
-    });
-    soundToggle.addEventListener("change", (e) => {
-      soundEnabled = !!e.target.checked;
-    });
-
-    // --- Producten ---
-    const productsRef = ref(db, "products");
-
-    onValue(productsRef, (snapshot) => {
-      productList.innerHTML = "";
-      productImages = {}; // reset lookup
-
-      snapshot.forEach(childSnapshot => {
-        const product = childSnapshot.val();
-        const productKey = childSnapshot.key;
-
-        // Map voor orders (optie 4b)
-        if (product?.name) {
-          productImages[product.name] = product.img || "";
-        }
-
-        // Render product card
-        const item = document.createElement("div");
-        item.className = "item";
-
-        const row = document.createElement("div");
-        row.className = "product-row";
-
-        const left = document.createElement("div");
-        left.className = "product-left";
-
-        const img = makeImg("product-img", product.img, product.name);
-
-        const name = document.createElement("div");
-        name.className = "name";
-        name.textContent = product.name || "(naamloos product)";
-
-        left.appendChild(img);
-        left.appendChild(name);
-
-        const btn = document.createElement("button");
-        btn.className = "btn btn-brand";
-        btn.textContent = product.available ? "Verwijder" : "Herstel";
-        btn.onclick = () => update(ref(db, `products/${productKey}`), { available: !product.available });
-
-        row.appendChild(left);
-        row.appendChild(btn);
-
-        item.appendChild(row);
-        productList.appendChild(item);
-      });
-    });
-
-    // --- Bestellingen (nieuwste bovenaan) ---
-    const ordersRef = ref(db, "orders");
-    const ordersQuery = query(ordersRef, orderByChild("timestamp"));
-
-    onValue(ordersQuery, (snapshot) => {
-      orderList.innerHTML = "";
-      const orders = [];
-
-      snapshot.forEach(childSnapshot => {
-        orders.push({ ...childSnapshot.val(), key: childSnapshot.key });
-      });
-
-      orders.reverse(); // newest first
-
-      // Detecteer nieuw (alleen bij updates na de eerste load)
-      let newCount = 0;
-
-      orders.forEach(order => {
-        const isNew = !seenOrderKeys.has(order.key);
-        // Mark as seen (we doen dit meteen zodat duplicate triggers voorkomen worden)
-        seenOrderKeys.add(order.key);
-
-        // Render order item
-        const item = document.createElement("div");
-        item.className = "item";
-        if (order.completed) item.classList.add("is-completed");
-
-        // highlight alleen voor nieuwe én niet-voltooide (meestal handig)
-        const shouldHighlight = highlightNewOrders && isNew && !order.completed;
-        if (shouldHighlight) {
-          item.classList.add("is-new");
-          newCount += 1;
-          // highlight na een paar seconden weghalen (optioneel)
-          setTimeout(() => item.classList.remove("is-new"), 6000);
-        }
-
-        // top row
-        const top = document.createElement("div");
-        top.className = "order-top";
-
-        const main = document.createElement("div");
-        main.className = "order-main";
-
-        // Optie 4b: haal img via productImages op basis van order.coffee
-        const imgUrl = productImages[order.coffee] || "";
-        const img = makeImg("order-img", imgUrl, order.coffee || "Product");
-
-        const text = document.createElement("span");
-        text.textContent = `${order.name || "Onbekend"} — ${order.coffee || "Onbekend product"}`;
-
-        main.appendChild(img);
-        main.appendChild(text);
-
-        const time = document.createElement("div");
-        time.className = "time";
-        if (order.timestamp) {
-          time.textContent = new Date(order.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        } else {
-          time.textContent = "";
-        }
-
-        top.appendChild(main);
-        top.appendChild(time);
-
-        // chips
-        const chips = document.createElement("div");
-        chips.className = "chips";
-
-        const milk = document.createElement("span");
-        milk.className = "chip " + (order.milk ? "on" : "off");
-        milk.textContent = order.milk ? "Melk: Ja" : "Melk: Nee";
-
-        const sugar = document.createElement("span");
-        sugar.className = "chip " + (order.sugar ? "on" : "off");
-        sugar.textContent = order.sugar ? "Suiker: Ja" : "Suiker: Nee";
-
-        chips.appendChild(milk);
-        chips.appendChild(sugar);
-
-        // actions
-        const actions = document.createElement("div");
-        actions.className = "order-actions";
-
-        const completeBtn = document.createElement("button");
-        completeBtn.className = "btn btn-ok";
-        completeBtn.textContent = order.completed ? "Voltooid" : "Markeer als voltooid";
-        completeBtn.disabled = !!order.completed;
-        completeBtn.style.opacity = order.completed ? "0.7" : "1";
-        completeBtn.onclick = () => update(ref(db, `orders/${order.key}`), { completed: true });
-
-        actions.appendChild(completeBtn);
-
-        item.appendChild(top);
-        item.appendChild(chips);
-        item.appendChild(actions);
-
-        orderList.appendChild(item);
-      });
-
-      // Bonus: geluid als er nieuwe orders binnenkomen (na eerste load)
-      // We willen niet "piepen" bij de allereerste initial load van bestaande orders.
-      // Daarom: als seenOrderKeys al gevuld was vóór deze run, piepen we voor newCount > 0.
-      // Eenvoudige aanpak: onthoud of we al een eerste run hebben gehad.
-      if (!window.__ordersInitialized) {
-        window.__ordersInitialized = true;
-      } else {
-        if (newCount > 0) beep();
-      }
-	  const clearBtn = document.getElementById("clear-orders-btn");
-
-clearBtn.onclick = () => {
-
-  const confirmed = confirm("Weet je zeker dat je ALLE bestellingen wilt verwijderen?");
-
-  if(!confirmed) return;
-
-  remove(ref(db, "orders"))
-    .then(() => {
-      alert("Alle bestellingen zijn gewist.");
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Er ging iets mis bij het verwijderen.");
-    });
+apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+authDomain: "koffie-bestellen.firebaseapp.com",
+databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "koffie-bestellen",
+storageBucket: "koffie-bestellen.firebasestorage.app",
+messagingSenderId: "592791423506",
+appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
 
 };
-    });
-  </script>
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const orderList = document.getElementById("order-list");
+
+const ordersRef = ref(db,"orders");
+const ordersQuery = query(ordersRef, orderByChild("timestamp"));
+
+onValue(ordersQuery,(snapshot)=>{
+
+orderList.innerHTML="";
+
+let orders=[];
+
+snapshot.forEach(child=>{
+
+orders.push({
+...child.val(),
+key:child.key
+});
+
+});
+
+orders.reverse();
+
+orders.forEach(order=>{
+
+const div=document.createElement("div");
+div.className="order";
+
+const img=document.createElement("img");
+img.src=getProductImage(order.coffee);
+
+div.appendChild(img);
+
+const info=document.createElement("div");
+info.className="order-info";
+
+const title=document.createElement("div");
+title.className="order-title";
+title.innerText=order.name+" bestelde "+order.coffee;
+
+const details=document.createElement("div");
+details.className="order-details";
+
+let extras=[];
+
+if(order.milk) extras.push("🥛 melk");
+if(order.sugar) extras.push("🍬 suiker");
+
+details.innerText=extras.length?extras.join(", "):"geen extra's";
+
+const status=document.createElement("div");
+status.className="order-status";
+
+if(order.completed){
+
+status.classList.add("done");
+status.innerText="Gereed";
+
+}else{
+
+status.classList.add("pending");
+status.innerText="In behandeling";
+
+}
+
+info.appendChild(title);
+info.appendChild(details);
+info.appendChild(status);
+
+div.appendChild(info);
+
+if(!order.completed){
+
+const button=document.createElement("button");
+button.className="complete-btn";
+button.innerText="☕ Voltooid";
+
+button.onclick=()=>{
+
+update(ref(db,"orders/"+order.key),{
+completed:true
+});
+
+};
+
+div.appendChild(button);
+
+}
+
+orderList.appendChild(div);
+
+});
+
+});
+
+/* PRODUCTAFBEELDINGEN */
+
+function getProductImage(name){
+
+const images={
+
+"Espresso":"images/espresso_menu_final.webp",
+"Long Black":"images/long_black_menu_final.webp",
+"Lungo":"images/long_black_menu_final.webp",
+"Latte Macchiato":"images/latte_macchiato_menu_final.webp",
+"Latte Macchiato Vanille":"images/vanille_menu_final.webp",
+"Latte Macchiato Caramel":"images/caramel_menu_final.webp",
+"Latte Macchiato Pumpkin Spice":"images/pumpkin_spice_menu_final.webp",
+"Ijskoffie":"images/iced_coffee_menu_final.webp",
+"Thee":"images/tea_menu_final.webp"
+
+};
+
+return images[name] || "images/espresso_menu_final.webp";
+
+}
+
+</script>
+
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <h1>Admin Paneel</h1>
-        <p class="subtitle">Producten met afbeeldingen + bestellingen met automatische productafbeelding (via <code>products[name].img</code>).</p>
-      </div>
 
-      <div class="controls">
-        <label class="toggle" title="Laat nieuwe bestellingen kort oplichten">
-          <input id="toggle-highlight" type="checkbox" checked />
-          Nieuwe bestellingen highlight
-        </label>
+<h1>Koffie Dashboard</h1>
 
-        <label class="toggle" title="Speel een kort geluid af bij nieuwe bestellingen">
-          <input id="toggle-sound" type="checkbox" checked />
-          Geluid bij nieuwe bestelling
-        </label>
-      </div>
-    </header>
+<div class="order-list">
 
-    <div class="grid">
-      <!-- Producten -->
-      <section class="panel">
-        <div class="panel-head">
-          <h2 class="panel-title">Producten</h2>
-        </div>
-        <div class="panel-body">
-          <div id="product-list"></div>
-        </div>
-      </section>
-
-      <!-- Bestellingen -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2 class="panel-title">Bestellingen</h2>
-
-      <button id="clear-orders-btn" class="btn btn-danger">
-        Wis alle bestellingen
-      </button>
-    </div>
-
-    <div class="panel-body">
-      <div id="order-list"></div>
-    </div>
-  </section>
+<div id="order-list"></div>
 
 </div>
-  </div>
+
 </body>
 </html>
