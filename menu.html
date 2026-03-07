@@ -295,17 +295,17 @@ grid.appendChild(card);
 
 function placeOrder(){
 
-const name=localStorage.getItem("customerName");
+if(!selectedCoffee) return;
+
+const name = localStorage.getItem("customerName");
 
 push(ref(db,"orders"),{
-
-name:name,
+name,
 coffee:selectedCoffee,
 milk:false,
 sugar:false,
 completed:false,
 timestamp:Date.now()
-
 });
 
 showBrewing();
@@ -396,6 +396,17 @@ document.getElementById("menu-screen").style.display="block";
 initMenu();
 listenOrders();
 
+document.getElementById("order-btn").addEventListener("click", () => {
+
+if(!selectedCoffee){
+alert("Selecteer eerst een drankje");
+return;
+}
+
+placeOrder();
+
+});
+
 };
 
 };
@@ -426,7 +437,7 @@ listenOrders();
 
 <div class="sticky-order" id="sticky-order">
 
-<button id="order-btn" class="btn-order" onclick="placeOrder()">
+<button id="order-btn" class="btn-order">
 ☕ Bestellen
 </button>
 
