@@ -464,15 +464,28 @@ document.getElementById("coffee-status").style.display="flex";
 
 function listenForCompletion(id){
 
-onValue(ref(db,"orders/"+id),(snap)=>{
+const orderRef = ref(db,"orders/"+id);
 
-const order=snap.val();
+let firstLoad = true;
+let previousCompleted = false;
 
-if(order && order.completed){
+onValue(orderRef,(snap)=>{
 
-showReady();
+const order = snap.val();
 
+if(!order) return;
+
+if(firstLoad){
+previousCompleted = order.completed || false;
+firstLoad = false;
+return;
 }
+
+if(order.completed && !previousCompleted){
+showReady();
+}
+
+previousCompleted = order.completed;
 
 });
 
