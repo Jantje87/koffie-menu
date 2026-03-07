@@ -315,6 +315,59 @@ const db=getDatabase(app);
 
 let selectedCoffee=null;
 
+const BREWING_CARD_HTML = `
+  <h2>Je koffie wordt gezet...</h2>
+
+  <div class="machine">
+    <svg viewBox="0 0 320 200">
+
+      <rect x="40" y="30" width="240" height="90" rx="8" fill="#dcdcdc"/>
+      <rect x="40" y="30" width="240" height="14" fill="#bfbfbf"/>
+
+      <rect x="60" y="20" width="200" height="10" fill="#999"/>
+
+      <circle cx="230" cy="75" r="18" fill="white" stroke="#444" stroke-width="3"/>
+      <line class="gauge-needle"
+        x1="230" y1="75" x2="230" y2="63"
+        stroke="#c98a3a"
+        stroke-width="3"/>
+
+      <circle cx="160" cy="100" r="16" fill="#888"/>
+      <rect x="150" y="95" width="20" height="20" fill="#666"/>
+
+      <rect x="135" y="118" width="50" height="8" rx="3" fill="#333"/>
+      <rect x="175" y="120" width="50" height="6" rx="3" fill="#222"/>
+
+      <rect x="148" y="126" width="6" height="8" fill="#444"/>
+      <rect x="166" y="126" width="6" height="8" fill="#444"/>
+
+      <rect class="espresso-flow" x="150" y="134" width="4" height="0" fill="#4a250a"/>
+      <rect class="espresso-flow right" x="168" y="134" width="4" height="0" fill="#4a250a"/>
+
+      <path d="M120 160 L200 160 L190 185 L130 185 Z"
+        fill="white"
+        stroke="#444"
+        stroke-width="3"/>
+
+      <rect class="coffee-fill" x="130" y="175" width="60" height="0" fill="#5a2d0c"/>
+      <rect class="crema-fill" x="130" y="173" width="60" height="0" fill="#c98a3a"/>
+
+      <path class="steam s1"
+        d="M150 150 C140 135 160 135 155 115"
+        stroke="#bbb"
+        stroke-width="3"
+        fill="none"/>
+
+      <path class="steam s2"
+        d="M175 150 C165 135 185 135 180 115"
+        stroke="#bbb"
+        stroke-width="3"
+        fill="none"/>
+
+    </svg>
+  </div>
+`;
+
 /* pump geluid */
 
 function playPumpSound(){
@@ -409,7 +462,9 @@ listenForCompletion(orderRef.key);
 }
 
 function showBrewing(){
-document.getElementById("coffee-status").style.display="flex";
+  const card = document.getElementById("coffee-card");
+  card.innerHTML = BREWING_CARD_HTML;
+  document.getElementById("coffee-status").style.display = "flex";
 }
 
 /* veilige order listener */
@@ -444,17 +499,16 @@ previousCompleted=order.completed;
 }
 
 function showReady(){
+  const card = document.getElementById("coffee-card");
 
-const card=document.getElementById("coffee-card");
+  card.innerHTML = `
+    <div class="ready">✅</div>
+    <h2>Je koffie is klaar!</h2>
+  `;
 
-card.innerHTML=`<div class="ready">✅</div><h2>Je koffie is klaar!</h2>`;
-
-setTimeout(()=>{
-
-document.getElementById("coffee-status").style.display="none";
-
-},3000);
-
+  setTimeout(() => {
+    document.getElementById("coffee-status").style.display = "none";
+  }, 3000);
 }
 
 window.onload=()=>{
