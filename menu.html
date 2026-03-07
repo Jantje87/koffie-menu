@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Koffie Menu</title>
 
 <style>
+
 body{
 font-family: Arial, sans-serif;
 background:#f6f1ec;
 margin:0;
 padding:0;
 }
+
+/* NAAM SCHERM */
 
 #name-screen{
 max-width:400px;
@@ -32,9 +36,11 @@ border:1px solid #ccc;
 margin:10px 0;
 }
 
+/* MENU */
+
 #menu-screen{
 max-width:900px;
-margin:20px auto;
+margin:20px auto 120px auto;
 display:none;
 }
 
@@ -44,10 +50,12 @@ grid-template-columns:repeat(4,1fr);
 gap:12px;
 }
 
+/* CARD */
+
 .card{
 background:white;
 border-radius:16px;
-padding:12px;
+padding:14px;
 box-shadow:0 6px 15px rgba(0,0,0,0.08);
 text-align:center;
 cursor:pointer;
@@ -60,13 +68,22 @@ transform:scale(1.03);
 
 .card.selected{
 border:2px solid #c98a3a;
+background:rgba(201,138,58,0.08);
 }
 
 .card img{
-width:120px;
-height:120px;
+width:130px;
+height:130px;
 object-fit:contain;
 }
+
+.card span{
+display:block;
+font-weight:bold;
+margin-top:6px;
+}
+
+/* OPTIONS */
 
 .card-options{
 margin-top:10px;
@@ -75,15 +92,34 @@ gap:10px;
 justify-content:center;
 }
 
+.opt{
+font-size:14px;
+}
+
+/* STICKY ORDER BAR */
+
 .sticky-order{
 position:fixed;
 bottom:0;
 left:0;
 right:0;
 background:#f6f1ec;
-padding:12px;
+padding:16px;
 box-shadow:0 -10px 20px rgba(0,0,0,0.08);
 display:none;
+}
+
+.sticky-inner{
+max-width:900px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.sticky-label{
+font-weight:bold;
+font-size:16px;
 }
 
 .btn{
@@ -105,6 +141,32 @@ color:white;
 font-weight:bold;
 }
 
+/* TABLET */
+
+@media (max-width:900px){
+
+.grid{
+grid-template-columns:repeat(3,1fr);
+}
+
+}
+
+/* MOBILE */
+
+@media (max-width:600px){
+
+.grid{
+grid-template-columns:repeat(2,1fr);
+gap:14px;
+}
+
+.card img{
+width:120px;
+height:120px;
+}
+
+}
+
 </style>
 
 <script type="module">
@@ -112,7 +174,10 @@ font-weight:bold;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+/* FIREBASE */
+
 const firebaseConfig = {
+
 apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
 authDomain: "koffie-bestellen.firebaseapp.com",
 databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
@@ -120,6 +185,7 @@ projectId: "koffie-bestellen",
 storageBucket: "koffie-bestellen.firebasestorage.app",
 messagingSenderId: "592791423506",
 appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -127,17 +193,15 @@ const db = getDatabase(app);
 
 let selectedCoffee=null;
 
-/* ------------------------------------------------ */
-/* THUISLOCATIE INSTELLINGEN */
-/* ------------------------------------------------ */
+/* THUISLOCATIE */
 
-const HOME_LAT = 53.25321897785381;   // <-- vervang dit
-const HOME_LNG = 6.587311427043095;    // <-- vervang dit
+const HOME_LAT = 53.25321897785381;
+const HOME_LNG = 6.587311427043095;
 const ALLOWED_RADIUS_METERS = 100;
 
-/* ------------------------------------------------ */
+/* DISTANCE */
 
-function getDistance(lat1, lon1, lat2, lon2){
+function getDistance(lat1,lon1,lat2,lon2){
 
 const R=6371000;
 const toRad=(v)=>v*Math.PI/180;
@@ -146,8 +210,9 @@ const dLat=toRad(lat2-lat1);
 const dLon=toRad(lon2-lon1);
 
 const a =
-Math.sin(dLat/2)**2+
-Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+Math.sin(dLat/2)**2 +
+Math.cos(toRad(lat1))*Math.cos(toRad(lat2)) *
+Math.sin(dLon/2)**2;
 
 const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 
@@ -159,37 +224,29 @@ function checkLocation(){
 
 return new Promise((resolve,reject)=>{
 
-if(!navigator.geolocation){
-reject("Geolocatie niet ondersteund");
-return;
-}
-
 navigator.geolocation.getCurrentPosition(position=>{
 
 const userLat=position.coords.latitude;
 const userLng=position.coords.longitude;
 
-const distance=getDistance(
-userLat,
-userLng,
-HOME_LAT,
-HOME_LNG
-);
+const distance=getDistance(userLat,userLng,HOME_LAT,HOME_LNG);
 
 resolve({
+
 allowed:distance<=ALLOWED_RADIUS_METERS,
-distance:distance
+distance
+
 });
 
-},error=>reject(error),
-{
-enableHighAccuracy:true,
-timeout:10000
-});
+},
+error=>reject(error),
+{enableHighAccuracy:true});
 
 });
 
 }
+
+/* OPTIONS */
 
 function showOptions(card){
 
@@ -197,13 +254,24 @@ const div=document.createElement("div");
 div.className="card-options";
 
 div.innerHTML=`
-<label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
-<label><input type="checkbox" class="sugar-checkbox"> 🍬 Suiker</label>
+
+<label class="opt">
+<input type="checkbox" class="milk-checkbox">
+🥛
+</label>
+
+<label class="opt">
+<input type="checkbox" class="sugar-checkbox">
+🍬
+</label>
+
 `;
 
 card.appendChild(div);
 
 }
+
+/* ORDER */
 
 async function placeOrder(coffee){
 
@@ -219,24 +287,26 @@ return;
 
 }
 
-}catch(err){
+}catch{
 
 alert("Sta locatietoegang toe om te bestellen.");
 return;
 
 }
 
-const selectedCard=document.querySelector(".card.selected");
+const card=document.querySelector(".card.selected");
 
-const milk=selectedCard.querySelector(".milk-checkbox")?.checked||false;
-const sugar=selectedCard.querySelector(".sugar-checkbox")?.checked||false;
+const milk=card.querySelector(".milk-checkbox")?.checked||false;
+const sugar=card.querySelector(".sugar-checkbox")?.checked||false;
 
 const order={
+
 name:localStorage.getItem("customerName"),
-coffee:coffee,
-milk:milk,
-sugar:sugar,
+coffee,
+milk,
+sugar,
 timestamp:Date.now()
+
 };
 
 push(ref(db,"orders"),order);
@@ -247,13 +317,15 @@ document.getElementById("sticky-order").style.display="none";
 
 }
 
+/* MENU */
+
 function initMenu(){
 
 const grid=document.getElementById("menu-grid");
 
 const productsRef=ref(db,"products");
 
-onValue(productsRef,(snapshot)=>{
+onValue(productsRef,snapshot=>{
 
 grid.innerHTML="";
 
@@ -269,7 +341,7 @@ card.className="card";
 const img=document.createElement("img");
 img.src=product.img;
 
-const name=document.createElement("div");
+const name=document.createElement("span");
 name.innerText=product.name;
 
 card.appendChild(img);
@@ -278,8 +350,10 @@ card.appendChild(name);
 card.onclick=()=>{
 
 document.querySelectorAll(".card").forEach(c=>{
+
 c.classList.remove("selected");
 c.querySelector(".card-options")?.remove();
+
 });
 
 card.classList.add("selected");
@@ -288,11 +362,19 @@ selectedCoffee=product.name;
 
 showOptions(card);
 
-document.getElementById("sticky-order").style.display="block";
+/* BESTELKNOP TEKST */
+
 document.getElementById("sticky-label").innerText=product.name;
 
+document.getElementById("sticky-order-btn").innerHTML=
+"☕ Bestel "+product.name;
+
+document.getElementById("sticky-order").style.display="block";
+
 document.getElementById("sticky-order-btn").onclick=()=>{
+
 placeOrder(product.name);
+
 };
 
 };
@@ -305,6 +387,8 @@ grid.appendChild(card);
 
 }
 
+/* NAAM */
+
 window.onload=()=>{
 
 const savedName=localStorage.getItem("customerName");
@@ -313,6 +397,7 @@ if(savedName){
 
 document.getElementById("name-screen").style.display="none";
 document.getElementById("menu-screen").style.display="block";
+
 initMenu();
 
 }
@@ -322,8 +407,10 @@ document.getElementById("next-btn").onclick=()=>{
 const name=document.getElementById("customer-name").value.trim();
 
 if(!name){
+
 alert("Vul eerst je naam in");
 return;
+
 }
 
 localStorage.setItem("customerName",name);
@@ -338,15 +425,23 @@ initMenu();
 };
 
 </script>
+
 </head>
 
 <body>
 
 <div id="name-screen">
+
 <h2>Vul je naam in</h2>
+
 <input id="customer-name" placeholder="Naam">
+
 <br><br>
-<button class="btn btn-primary" id="next-btn">Volgende</button>
+
+<button class="btn btn-primary" id="next-btn">
+Volgende
+</button>
+
 </div>
 
 <div id="menu-screen">
@@ -357,11 +452,17 @@ initMenu();
 
 <div class="sticky-order" id="sticky-order">
 
-<span id="sticky-label"></span>
+<div class="sticky-inner">
+
+<span class="sticky-label" id="sticky-label"></span>
 
 <button class="btn btn-order" id="sticky-order-btn">
-☕ Bestelling plaatsen
+
+☕ Bestellen
+
 </button>
+
+</div>
 
 </div>
 
