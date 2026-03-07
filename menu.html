@@ -113,8 +113,6 @@ display:none;
 max-width:900px;
 margin:auto;
 display:flex;
-align-items:center;
-justify-content:space-between;
 }
 
 .sticky-label{
@@ -139,6 +137,9 @@ color:white;
 background:#c98a3a;
 color:white;
 font-weight:bold;
+width:100%;
+font-size:18px;
+padding:16px;
 }
 
 /* TABLET */
@@ -385,8 +386,6 @@ selectedCoffee=product.name;
 
 showOptions(card,product.name);
 
-document.getElementById("sticky-label").innerText=product.name;
-
 document.getElementById("sticky-order-btn").innerHTML=
 "☕ Bestel "+product.name;
 
@@ -469,8 +468,6 @@ Volgende
 <div class="sticky-order" id="sticky-order">
 
 <div class="sticky-inner">
-
-<span class="sticky-label" id="sticky-label"></span>
 
 <button class="btn btn-order" id="sticky-order-btn">
 ☕ Bestellen
