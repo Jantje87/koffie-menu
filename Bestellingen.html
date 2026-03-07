@@ -1,90 +1,142 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
+
 <meta charset="UTF-8">
-<title>Koffie Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Koffie Admin</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:#f6f1ec;
+background:#f6f4f2;
 margin:0;
 padding:20px;
 }
 
 h1{
-text-align:center;
 color:#6d4c41;
 }
 
-.order-list{
-max-width:900px;
+.container{
+max-width:1100px;
 margin:auto;
-background:white;
-padding:20px;
-border-radius:15px;
-box-shadow:0 8px 20px rgba(0,0,0,0.1);
 }
 
-.order{
+.grid{
+display:grid;
+grid-template-columns:1fr 1.2fr;
+gap:16px;
+}
+
+.panel{
+background:white;
+border-radius:16px;
+padding:15px;
+box-shadow:0 10px 24px rgba(0,0,0,0.08);
+}
+
+.item{
+border:1px solid #eee;
+border-radius:12px;
+padding:10px;
+margin-bottom:10px;
+}
+
+.product-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.product-left{
 display:flex;
 align-items:center;
-justify-content:space-between;
-padding:12px;
-border-bottom:1px solid #eee;
 gap:10px;
 }
 
-.order img{
-width:60px;
-height:60px;
-object-fit:contain;
+.product-img{
+width:40px;
+height:40px;
+object-fit:cover;
+border-radius:10px;
 }
 
-.order-info{
-flex:1;
+.order-top{
+display:flex;
+justify-content:space-between;
 }
 
-.order-title{
+.order-main{
+display:flex;
+align-items:center;
+gap:10px;
 font-weight:bold;
-font-size:16px;
 }
 
-.order-details{
-font-size:14px;
-color:#666;
+.order-img{
+width:36px;
+height:36px;
+border-radius:10px;
+object-fit:cover;
 }
 
-.order-status{
-font-size:13px;
-font-weight:bold;
-margin-top:3px;
+.chips{
+margin-top:6px;
+display:flex;
+gap:6px;
 }
 
-.pending{
-color:#c98a3a;
+.chip{
+font-size:12px;
+padding:4px 8px;
+border-radius:20px;
+background:#eee;
 }
 
-.done{
-color:#4CAF50;
+.chip.on{
+background:#dff5e6;
+color:#1f8a4c;
 }
 
-button{
-padding:10px 16px;
+.chip.off{
+background:#f5e9e4;
+color:#6d4c41;
+}
+
+.btn{
+padding:8px 12px;
 border:none;
 border-radius:8px;
 cursor:pointer;
 font-weight:bold;
 }
 
-.complete-btn{
-background:#4CAF50;
+.btn-brand{
+background:#6d4c41;
 color:white;
 }
 
-.complete-btn:hover{
-background:#43a047;
+.btn-ok{
+background:#1f8a4c;
+color:white;
+}
+
+.btn-danger{
+background:#d32f2f;
+color:white;
+}
+
+.is-completed{
+opacity:0.7;
+text-decoration:line-through;
+}
+
+.is-new{
+background:#fff8e1;
+border-color:#ffd54f;
 }
 
 </style>
@@ -92,27 +144,133 @@ background:#43a047;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, onValue, update, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-const firebaseConfig = {
+import {
+getDatabase,
+ref,
+onValue,
+update,
+remove,
+query,
+orderByChild
+}
 
-apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-authDomain: "koffie-bestellen.firebaseapp.com",
-databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-projectId: "koffie-bestellen",
-storageBucket: "koffie-bestellen.firebasestorage.app",
-messagingSenderId: "592791423506",
-appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+authDomain:"koffie-bestellen.firebaseapp.com",
+databaseURL:"https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+projectId:"koffie-bestellen",
+storageBucket:"koffie-bestellen.firebasestorage.app",
+messagingSenderId:"592791423506",
+appId:"1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+let productImages={};
+const seenOrderKeys=new Set();
+
+function beep(){
+
+try{
+
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+
+const osc=ctx.createOscillator();
+const gain=ctx.createGain();
+
+osc.frequency.value=880;
+
+osc.connect(gain);
+gain.connect(ctx.destination);
+
+gain.gain.setValueAtTime(0.001,ctx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.2,ctx.currentTime+0.01);
+gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);
+
+osc.start();
+osc.stop(ctx.currentTime+0.21);
+
+}catch(e){}
+
+}
+
+function makeImg(className,src){
+
+const img=document.createElement("img");
+
+img.className=className;
+img.src=src||"";
+img.loading="lazy";
+
+img.onerror=()=>img.style.display="none";
+
+return img;
+
+}
+
+const productList=document.getElementById("product-list");
+const orderList=document.getElementById("order-list");
+
+const productsRef=ref(db,"products");
+
+onValue(productsRef,(snapshot)=>{
+
+productList.innerHTML="";
+productImages={};
+
+snapshot.forEach(child=>{
+
+const product=child.val();
+const key=child.key;
+
+productImages[product.name]=product.img||"";
+
+const item=document.createElement("div");
+item.className="item";
+
+const row=document.createElement("div");
+row.className="product-row";
+
+const left=document.createElement("div");
+left.className="product-left";
+
+const img=makeImg("product-img",product.img);
+
+const name=document.createElement("div");
+name.innerText=product.name;
+
+left.appendChild(img);
+left.appendChild(name);
+
+const btn=document.createElement("button");
+btn.className="btn btn-brand";
+btn.innerText=product.available?"Verwijder":"Herstel";
+
+btn.onclick=()=>{
+
+update(ref(db,"products/"+key),{
+available:!product.available
+});
 
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+row.appendChild(left);
+row.appendChild(btn);
 
-const orderList = document.getElementById("order-list");
+item.appendChild(row);
 
-const ordersRef = ref(db,"orders");
-const ordersQuery = query(ordersRef, orderByChild("timestamp"));
+productList.appendChild(item);
+
+});
+
+});
+
+const ordersRef=ref(db,"orders");
+const ordersQuery=query(ordersRef,orderByChild("timestamp"));
 
 onValue(ordersQuery,(snapshot)=>{
 
@@ -131,61 +289,75 @@ key:child.key
 
 orders.reverse();
 
+let newOrders=0;
+
 orders.forEach(order=>{
 
-const div=document.createElement("div");
-div.className="order";
+const isNew=!seenOrderKeys.has(order.key);
 
-const img=document.createElement("img");
-img.src=getProductImage(order.coffee);
+seenOrderKeys.add(order.key);
 
-div.appendChild(img);
+const item=document.createElement("div");
+item.className="item";
 
-const info=document.createElement("div");
-info.className="order-info";
+if(order.completed) item.classList.add("is-completed");
 
-const title=document.createElement("div");
-title.className="order-title";
-title.innerText=order.name+" bestelde "+order.coffee;
+if(isNew && !order.completed){
 
-const details=document.createElement("div");
-details.className="order-details";
-
-let extras=[];
-
-if(order.milk) extras.push("🥛 melk");
-if(order.sugar) extras.push("🍬 suiker");
-
-details.innerText=extras.length?extras.join(", "):"geen extra's";
-
-const status=document.createElement("div");
-status.className="order-status";
-
-if(order.completed){
-
-status.classList.add("done");
-status.innerText="Gereed";
-
-}else{
-
-status.classList.add("pending");
-status.innerText="In behandeling";
+item.classList.add("is-new");
+newOrders++;
 
 }
 
-info.appendChild(title);
-info.appendChild(details);
-info.appendChild(status);
+const top=document.createElement("div");
+top.className="order-top";
 
-div.appendChild(info);
+const main=document.createElement("div");
+main.className="order-main";
 
-if(!order.completed){
+const img=makeImg("order-img",productImages[order.coffee]);
 
-const button=document.createElement("button");
-button.className="complete-btn";
-button.innerText="☕ Voltooid";
+const text=document.createElement("span");
+text.innerText=order.name+" — "+order.coffee;
 
-button.onclick=()=>{
+main.appendChild(img);
+main.appendChild(text);
+
+const time=document.createElement("div");
+time.innerText=new Date(order.timestamp).toLocaleTimeString();
+
+top.appendChild(main);
+top.appendChild(time);
+
+const chips=document.createElement("div");
+chips.className="chips";
+
+const milk=document.createElement("span");
+milk.className="chip "+(order.milk?"on":"off");
+milk.innerText="Melk";
+
+const sugar=document.createElement("span");
+sugar.className="chip "+(order.sugar?"on":"off");
+sugar.innerText="Suiker";
+
+chips.appendChild(milk);
+chips.appendChild(sugar);
+
+const actions=document.createElement("div");
+
+const btn=document.createElement("button");
+btn.className="btn btn-ok";
+
+if(order.completed){
+
+btn.innerText="☕ Klaar";
+btn.disabled=true;
+
+}else{
+
+btn.innerText="☕ Markeer als klaar";
+
+btn.onclick=()=>{
 
 update(ref(db,"orders/"+order.key),{
 completed:true
@@ -193,37 +365,29 @@ completed:true
 
 };
 
-div.appendChild(button);
-
 }
 
-orderList.appendChild(div);
+actions.appendChild(btn);
+
+item.appendChild(top);
+item.appendChild(chips);
+item.appendChild(actions);
+
+orderList.appendChild(item);
 
 });
 
+if(newOrders>0) beep();
+
 });
 
-/* PRODUCTAFBEELDINGEN */
+document.getElementById("clear-orders-btn").onclick=()=>{
 
-function getProductImage(name){
+if(!confirm("Alle bestellingen verwijderen?")) return;
 
-const images={
-
-"Espresso":"images/espresso_menu_final.webp",
-"Long Black":"images/long_black_menu_final.webp",
-"Lungo":"images/long_black_menu_final.webp",
-"Latte Macchiato":"images/latte_macchiato_menu_final.webp",
-"Latte Macchiato Vanille":"images/vanille_menu_final.webp",
-"Latte Macchiato Caramel":"images/caramel_menu_final.webp",
-"Latte Macchiato Pumpkin Spice":"images/pumpkin_spice_menu_final.webp",
-"Ijskoffie":"images/iced_coffee_menu_final.webp",
-"Thee":"images/tea_menu_final.webp"
+remove(ref(db,"orders"));
 
 };
-
-return images[name] || "images/espresso_menu_final.webp";
-
-}
 
 </script>
 
@@ -231,11 +395,33 @@ return images[name] || "images/espresso_menu_final.webp";
 
 <body>
 
+<div class="container">
+
 <h1>Koffie Dashboard</h1>
 
-<div class="order-list">
+<div class="grid">
+
+<div class="panel">
+
+<h2>Producten</h2>
+
+<div id="product-list"></div>
+
+</div>
+
+<div class="panel">
+
+<h2>Bestellingen</h2>
+
+<button id="clear-orders-btn" class="btn btn-danger">
+Wis alle bestellingen
+</button>
 
 <div id="order-list"></div>
+
+</div>
+
+</div>
 
 </div>
 
