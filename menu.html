@@ -195,8 +195,8 @@ let selectedCoffee=null;
 
 /* THUISLOCATIE */
 
-const HOME_LAT = 53.25321897785381;
-const HOME_LNG = 6.587311427043095;
+const HOME_LAT = 52.123456;   // <-- aanpassen
+const HOME_LNG = 5.123456;    // <-- aanpassen
 const ALLOWED_RADIUS_METERS = 100;
 
 /* DISTANCE */
@@ -232,10 +232,8 @@ const userLng=position.coords.longitude;
 const distance=getDistance(userLat,userLng,HOME_LAT,HOME_LNG);
 
 resolve({
-
 allowed:distance<=ALLOWED_RADIUS_METERS,
 distance
-
 });
 
 },
@@ -248,26 +246,56 @@ error=>reject(error),
 
 /* OPTIONS */
 
-function showOptions(card){
+function showOptions(cardElement, coffeeName){
 
-const div=document.createElement("div");
-div.className="card-options";
+const optionsDiv=document.createElement("div");
+optionsDiv.className="card-options";
 
-div.innerHTML=`
+const sugarIcon = `
+<svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#d7ccc8" stroke-width="1.5">
+<rect x="3" y="8" width="8" height="8" rx="2"/>
+<rect x="9" y="4" width="8" height="8" rx="2"/>
+<rect x="13" y="10" width="8" height="8" rx="2"/>
+</svg>
+`;
+
+if(
+coffeeName==="Espresso" ||
+coffeeName==="Long Black" ||
+coffeeName==="Lungo"
+){
+
+optionsDiv.innerHTML=`
 
 <label class="opt">
-<input type="checkbox" class="milk-checkbox">
-🥛
+<input type="checkbox" class="milk-checkbox"> 🥛
 </label>
 
 <label class="opt">
-<input type="checkbox" class="sugar-checkbox">
-🍬
+<input type="checkbox" class="sugar-checkbox"> ${sugarIcon}
 </label>
 
 `;
 
-card.appendChild(div);
+}
+
+else if(coffeeName.includes("Latte Macchiato")){
+
+optionsDiv.innerHTML=`
+
+<label class="opt">
+<input type="checkbox" class="sugar-checkbox"> ${sugarIcon}
+</label>
+
+`;
+
+}
+
+optionsDiv.querySelectorAll("input").forEach(cb=>{
+cb.addEventListener("click", e => e.stopPropagation());
+});
+
+cardElement.appendChild(optionsDiv);
 
 }
 
@@ -282,7 +310,6 @@ const locationCheck=await checkLocation();
 if(!locationCheck.allowed){
 
 alert("Bestellen kan alleen bij mij thuis.\nJe bent ongeveer "+Math.round(locationCheck.distance)+" meter verwijderd.");
-
 return;
 
 }
@@ -300,13 +327,11 @@ const milk=card.querySelector(".milk-checkbox")?.checked||false;
 const sugar=card.querySelector(".sugar-checkbox")?.checked||false;
 
 const order={
-
 name:localStorage.getItem("customerName"),
 coffee,
 milk,
 sugar,
 timestamp:Date.now()
-
 };
 
 push(ref(db,"orders"),order);
@@ -322,7 +347,6 @@ document.getElementById("sticky-order").style.display="none";
 function initMenu(){
 
 const grid=document.getElementById("menu-grid");
-
 const productsRef=ref(db,"products");
 
 onValue(productsRef,snapshot=>{
@@ -332,7 +356,6 @@ grid.innerHTML="";
 snapshot.forEach(child=>{
 
 const product=child.val();
-
 if(!product.available) return;
 
 const card=document.createElement("div");
@@ -347,22 +370,20 @@ name.innerText=product.name;
 card.appendChild(img);
 card.appendChild(name);
 
-card.onclick=()=>{
+card.onclick=(e)=>{
+
+if(e.target.tagName==="INPUT") return;
 
 document.querySelectorAll(".card").forEach(c=>{
-
 c.classList.remove("selected");
 c.querySelector(".card-options")?.remove();
-
 });
 
 card.classList.add("selected");
 
 selectedCoffee=product.name;
 
-showOptions(card);
-
-/* BESTELKNOP TEKST */
+showOptions(card,product.name);
 
 document.getElementById("sticky-label").innerText=product.name;
 
@@ -372,9 +393,7 @@ document.getElementById("sticky-order-btn").innerHTML=
 document.getElementById("sticky-order").style.display="block";
 
 document.getElementById("sticky-order-btn").onclick=()=>{
-
 placeOrder(product.name);
-
 };
 
 };
@@ -397,7 +416,6 @@ if(savedName){
 
 document.getElementById("name-screen").style.display="none";
 document.getElementById("menu-screen").style.display="block";
-
 initMenu();
 
 }
@@ -407,10 +425,8 @@ document.getElementById("next-btn").onclick=()=>{
 const name=document.getElementById("customer-name").value.trim();
 
 if(!name){
-
 alert("Vul eerst je naam in");
 return;
-
 }
 
 localStorage.setItem("customerName",name);
@@ -457,9 +473,7 @@ Volgende
 <span class="sticky-label" id="sticky-label"></span>
 
 <button class="btn btn-order" id="sticky-order-btn">
-
 ☕ Bestellen
-
 </button>
 
 </div>
