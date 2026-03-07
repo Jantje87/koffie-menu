@@ -1,503 +1,369 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Koffie Menu</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Koffie Menu</title>
 
-  <style>
-    :root{
-      --bg: #f6f1ec;
-      --panel: rgba(255,255,255,0.78);
-      --card: #ffffff;
-      --text: #2b2b2b;
-      --muted: #6f6a66;
-      --border: #e9dfd7;
+<style>
+body{
+font-family: Arial, sans-serif;
+background:#f6f1ec;
+margin:0;
+padding:0;
+}
 
-      --brand: #6d4c41;
-      --brand2: #8d6e63;
+#name-screen{
+max-width:400px;
+margin:40px auto;
+text-align:center;
+background:white;
+padding:30px;
+border-radius:16px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
 
-      --caramel: #c98a3a;
-      --caramelSoft: rgba(201,138,58,0.14);
+#name-screen input{
+width:80%;
+padding:10px;
+font-size:16px;
+border-radius:8px;
+border:1px solid #ccc;
+margin:10px 0;
+}
 
-      --shadow: 0 14px 34px rgba(0,0,0,0.08);
-      --shadow2: 0 10px 20px rgba(0,0,0,0.06);
-      --radius: 18px;
-    }
+#menu-screen{
+max-width:900px;
+margin:20px auto;
+display:none;
+}
 
-    *{ box-sizing: border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 800px at 15% 0%, rgba(255,255,255,0.9), rgba(255,255,255,0) 55%),
-        radial-gradient(1000px 700px at 90% 10%, rgba(255,246,235,0.9), rgba(255,255,255,0) 60%),
-        var(--bg);
-      color: var(--text);
-    }
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+}
 
-    /* Naam scherm */
-    #name-screen{
-      width: min(420px, 92vw);
-      margin: 34px auto;
-      text-align: center;
-      background: var(--panel);
-      backdrop-filter: blur(8px);
-      padding: 26px 22px;
-      border-radius: 22px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
+.card{
+background:white;
+border-radius:16px;
+padding:12px;
+box-shadow:0 6px 15px rgba(0,0,0,0.08);
+text-align:center;
+cursor:pointer;
+transition:0.2s;
+}
 
-    #name-screen h2{
-      margin: 0 0 8px;
-      color: var(--brand);
-      letter-spacing: .2px;
-    }
+.card:hover{
+transform:scale(1.03);
+}
 
-    #name-screen p{
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 14px;
-    }
+.card.selected{
+border:2px solid #c98a3a;
+}
 
-    #name-screen input{
-      width: 100%;
-      padding: 12px 14px;
-      margin: 12px 0 14px;
-      font-size: 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      outline: none;
-      background: rgba(255,255,255,0.9);
-    }
-    #name-screen input:focus{
-      border-color: rgba(201,138,58,0.55);
-      box-shadow: 0 0 0 4px rgba(201,138,58,0.12);
-    }
+.card img{
+width:120px;
+height:120px;
+object-fit:contain;
+}
 
-    .btn{
-      border: none;
-      cursor: pointer;
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-weight: 750;
-      letter-spacing: .2px;
-      transition: transform .05s ease, box-shadow .2s ease, opacity .2s ease;
-      user-select:none;
-    }
-    .btn:active{ transform: translateY(1px); }
+.card-options{
+margin-top:10px;
+display:flex;
+gap:10px;
+justify-content:center;
+}
 
-    .btn-primary{
-      width: 100%;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      color: #fff;
-      box-shadow: 0 10px 18px rgba(109,76,65,0.25);
-    }
-    .btn-primary:hover{ box-shadow: 0 14px 24px rgba(109,76,65,0.30); }
+.sticky-order{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#f6f1ec;
+padding:12px;
+box-shadow:0 -10px 20px rgba(0,0,0,0.08);
+display:none;
+}
 
-    .btn-ghost{
-      background: rgba(255,255,255,0.55);
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
+.btn{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:16px;
+}
 
-    /* Menu layout */
-    #menu-screen{
-      width: min(960px, 96vw);
-      margin: 18px auto 90px;
-      padding: 10px;
-      display: none;
-    }
+.btn-primary{
+background:#6d4c41;
+color:white;
+}
 
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 6px 0 12px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.55);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow2);
-    }
+.btn-order{
+background:#c98a3a;
+color:white;
+font-weight:bold;
+}
 
-    .who{
-      display:flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .who .label{ font-size: 12px; color: var(--muted); }
-    .who .name{ font-size: 15px; font-weight: 800; color: var(--brand); }
+</style>
 
-    /* Grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
+<script type="module">
 
-    .card{
-      background: rgba(255,255,255,0.88);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      cursor: pointer;
-      transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
-      display:flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-    }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    .card::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(400px 220px at 50% -10%, rgba(201,138,58,0.18), rgba(255,255,255,0));
-      opacity:0;
-      transition: opacity .18s ease;
-      pointer-events:none;
-    }
+const firebaseConfig = {
+apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+authDomain: "koffie-bestellen.firebaseapp.com",
+databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "koffie-bestellen",
+storageBucket: "koffie-bestellen.firebasestorage.app",
+messagingSenderId: "592791423506",
+appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+};
 
-    .card:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 16px 26px rgba(0,0,0,0.08);
-    }
-    .card:hover::after{ opacity: 1; }
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-    .card.selected{
-      border-color: rgba(201,138,58,0.75);
-      box-shadow: 0 18px 30px rgba(201,138,58,0.16);
-    }
+let selectedCoffee=null;
 
-    .card img{
-      width: 140px;
-      height: 140px;
-      object-fit: contain;
-      border-radius: 16px;
-      background: transparent;
-    }
+/* ------------------------------------------------ */
+/* THUISLOCATIE INSTELLINGEN */
+/* ------------------------------------------------ */
 
-    .card span{
-      text-align: center;
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1.15;
-    }
+const HOME_LAT = 53.25321897785381;   // <-- vervang dit
+const HOME_LNG = 6.587311427043095;    // <-- vervang dit
+const ALLOWED_RADIUS_METERS = 100;
 
-    /* Options */
-    .card-options{
-      width: 100%;
-      display:flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      padding-top: 8px;
-      border-top: 1px dashed rgba(233,223,215,0.9);
-      margin-top: 4px;
-    }
+/* ------------------------------------------------ */
 
-    .opt{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.75);
-      font-size: 14px;
-      color: var(--text);
-      user-select:none;
-    }
+function getDistance(lat1, lon1, lat2, lon2){
 
-    .opt input{
-      width: 18px;
-      height: 18px;
-      accent-color: var(--caramel);
-    }
+const R=6371000;
+const toRad=(v)=>v*Math.PI/180;
 
-    /* Sticky order bar */
-    .sticky-order{
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 12px;
-      background: rgba(246,241,236,0.75);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid var(--border);
-      box-shadow: 0 -12px 30px rgba(0,0,0,0.08);
-      display:none;
-    }
+const dLat=toRad(lat2-lat1);
+const dLon=toRad(lon2-lon1);
 
-    .sticky-inner{
-      width: min(960px, 96vw);
-      margin: 0 auto;
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
-    }
+const a =
+Math.sin(dLat/2)**2+
+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
 
-    .sticky-label{
-      font-weight: 800;
-      color: var(--brand);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 55%;
-    }
+const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 
-    .btn-order{
-      background: linear-gradient(135deg, var(--caramel), #e0a24b);
-      color: white;
-      box-shadow: 0 14px 24px rgba(201,138,58,0.22);
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
+return R*c;
 
-    /* Responsive */
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    @media (max-width: 720px){
-      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .card img{ width: 132px; height: 132px; }
-      .sticky-label{ max-width: 50%; }
-    }
-    @media (max-width: 420px){
-      .card img{ width: 120px; height: 120px; }
-      .sticky-label{ max-width: 46%; }
-    }
-  </style>
+}
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+function checkLocation(){
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-      authDomain: "koffie-bestellen.firebaseapp.com",
-      databaseURL: "https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "koffie-bestellen",
-      storageBucket: "koffie-bestellen.firebasestorage.app",
-      messagingSenderId: "592791423506",
-      appId: "1:592791423506:web:b4901c0cd2cf9094b9e6cb"
-    };
+return new Promise((resolve,reject)=>{
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+if(!navigator.geolocation){
+reject("Geolocatie niet ondersteund");
+return;
+}
 
-    let selectedCoffee = null;
+navigator.geolocation.getCurrentPosition(position=>{
 
-    function showOptions(cardElement, coffeeName) {
-      const optionsDiv = document.createElement("div");
-      optionsDiv.className = "card-options";
+const userLat=position.coords.latitude;
+const userLng=position.coords.longitude;
 
-      const sugarIcon = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c98a3a" stroke-width="1.7">
-          <rect x="3" y="8" width="8" height="8" rx="2"/>
-          <rect x="9" y="4" width="8" height="8" rx="2"/>
-          <rect x="13" y="10" width="8" height="8" rx="2"/>
-        </svg>
-      `;
+const distance=getDistance(
+userLat,
+userLng,
+HOME_LAT,
+HOME_LNG
+);
 
-      if (coffeeName === "Espresso" || coffeeName === "Lungo" || coffeeName === "Long Black") {
-        optionsDiv.innerHTML = `
-          <label class="opt"><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
-          <label class="opt"><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-        `;
-      } else if (coffeeName.includes("Latte Macchiato")) {
-        optionsDiv.innerHTML = `
-          <label class="opt"><input type="checkbox" class="sugar-checkbox"> ${sugarIcon} Suiker</label>
-        `;
-      }
+resolve({
+allowed:distance<=ALLOWED_RADIUS_METERS,
+distance:distance
+});
 
-      optionsDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
-        cb.addEventListener("click", (e) => e.stopPropagation());
-      });
+},error=>reject(error),
+{
+enableHighAccuracy:true,
+timeout:10000
+});
 
-      cardElement.appendChild(optionsDiv);
-    }
+});
 
-    function placeOrder(coffeeName) {
-      const selectedCard = document.querySelector(".card.selected");
-      const milk = selectedCard?.querySelector(".milk-checkbox")?.checked || false;
-      const sugar = selectedCard?.querySelector(".sugar-checkbox")?.checked || false;
+}
 
-      const customerName = localStorage.getItem("customerName") || "";
-      if (!customerName) {
-        alert("Je naam is niet gevonden. Vul je naam opnieuw in.");
-        document.getElementById("menu-screen").style.display = "none";
-        document.getElementById("sticky-order").style.display = "none";
-        document.getElementById("name-screen").style.display = "block";
-        return;
-      }
+function showOptions(card){
 
-      const order = {
-        name: customerName,
-        coffee: coffeeName,
-        milk,
-        sugar,
-        time: new Date().toLocaleTimeString(),
-        timestamp: Date.now()
-      };
+const div=document.createElement("div");
+div.className="card-options";
 
-      push(ref(db, "orders"), order);
-      alert("Bestelling geplaatst! ✅");
+div.innerHTML=`
+<label><input type="checkbox" class="milk-checkbox"> 🥛 Melk</label>
+<label><input type="checkbox" class="sugar-checkbox"> 🍬 Suiker</label>
+`;
 
-      // reset selectie + sticky bar
-      document.querySelectorAll(".card").forEach(c => {
-        c.classList.remove("selected");
-        const oldOptions = c.querySelector(".card-options");
-        if (oldOptions) oldOptions.remove();
-      });
-      selectedCoffee = null;
-      document.getElementById("sticky-label").textContent = "Kies een product…";
-      document.getElementById("sticky-order").style.display = "none";
-    }
+card.appendChild(div);
 
-    function initMenu() {
-      const menuGrid = document.getElementById("menu-grid");
-      menuGrid.innerHTML = "";
-      selectedCoffee = null;
+}
 
-      const stickyBar = document.getElementById("sticky-order");
-      const stickyLabel = document.getElementById("sticky-label");
-      const stickyBtn = document.getElementById("sticky-order-btn");
+async function placeOrder(coffee){
 
-      const productsRef = ref(db, "products");
-      onValue(productsRef, (snapshot) => {
-        menuGrid.innerHTML = ""; // voorkom duplicaten door realtime updates
+try{
 
-        snapshot.forEach((childSnapshot) => {
-          const product = childSnapshot.val();
-          if (!product?.available) return;
+const locationCheck=await checkLocation();
 
-          const card = document.createElement("div");
-          card.className = "card";
+if(!locationCheck.allowed){
 
-          const img = document.createElement("img");
-          img.src = product.img;     // <-- zet hier je (WebP/PNG) URL uit Firebase
-          img.alt = product.name || "Product";
-          img.loading = "lazy";
-          card.appendChild(img);
+alert("Bestellen kan alleen bij mij thuis.\nJe bent ongeveer "+Math.round(locationCheck.distance)+" meter verwijderd.");
 
-          const title = document.createElement("span");
-          title.textContent = product.name || "Onbekend";
-          card.appendChild(title);
+return;
 
-          card.onclick = () => {
-            document.querySelectorAll(".card").forEach(c => {
-              c.classList.remove("selected");
-              const oldOptions = c.querySelector(".card-options");
-              if (oldOptions) oldOptions.remove();
-            });
+}
 
-            card.classList.add("selected");
-            selectedCoffee = product.name;
+}catch(err){
 
-            showOptions(card, product.name);
+alert("Sta locatietoegang toe om te bestellen.");
+return;
 
-            stickyBar.style.display = "block";
-            stickyLabel.textContent = `${product.name}`;
-            stickyBtn.onclick = () => placeOrder(product.name);
-          };
+}
 
-          menuGrid.appendChild(card);
-        });
-      });
-    }
+const selectedCard=document.querySelector(".card.selected");
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const nameScreen = document.getElementById("name-screen");
-      const menuScreen = document.getElementById("menu-screen");
-      const nameInputEl = document.getElementById("customer-name");
-      const nextBtn = document.getElementById("next-btn");
+const milk=selectedCard.querySelector(".milk-checkbox")?.checked||false;
+const sugar=selectedCard.querySelector(".sugar-checkbox")?.checked||false;
 
-      const whoName = document.getElementById("who-name");
-      const changeNameBtn = document.getElementById("change-name-btn");
+const order={
+name:localStorage.getItem("customerName"),
+coffee:coffee,
+milk:milk,
+sugar:sugar,
+timestamp:Date.now()
+};
 
-      const savedName = localStorage.getItem("customerName");
-      if (savedName && savedName.trim()) {
-        nameScreen.style.display = "none";
-        menuScreen.style.display = "block";
-        whoName.textContent = savedName;
-        initMenu();
-      } else {
-        nameScreen.style.display = "block";
-        menuScreen.style.display = "none";
-        nameInputEl.value = "";
-        nameInputEl.focus();
-      }
+push(ref(db,"orders"),order);
 
-      nextBtn.addEventListener("click", () => {
-        const nameInput = nameInputEl.value.trim();
-        if (!nameInput) {
-          alert("Vul eerst je naam in!");
-          return;
-        }
-        localStorage.setItem("customerName", nameInput);
-        whoName.textContent = nameInput;
+alert("Bestelling geplaatst ☕");
 
-        nameScreen.style.display = "none";
-        menuScreen.style.display = "block";
-        initMenu();
-      });
+document.getElementById("sticky-order").style.display="none";
 
-      nameInputEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") nextBtn.click();
-      });
+}
 
-      changeNameBtn.addEventListener("click", () => {
-        localStorage.removeItem("customerName");
-        document.getElementById("sticky-order").style.display = "none";
-        menuScreen.style.display = "none";
-        nameScreen.style.display = "block";
-        nameInputEl.value = "";
-        nameInputEl.focus();
-      });
-    });
-  </script>
+function initMenu(){
+
+const grid=document.getElementById("menu-grid");
+
+const productsRef=ref(db,"products");
+
+onValue(productsRef,(snapshot)=>{
+
+grid.innerHTML="";
+
+snapshot.forEach(child=>{
+
+const product=child.val();
+
+if(!product.available) return;
+
+const card=document.createElement("div");
+card.className="card";
+
+const img=document.createElement("img");
+img.src=product.img;
+
+const name=document.createElement("div");
+name.innerText=product.name;
+
+card.appendChild(img);
+card.appendChild(name);
+
+card.onclick=()=>{
+
+document.querySelectorAll(".card").forEach(c=>{
+c.classList.remove("selected");
+c.querySelector(".card-options")?.remove();
+});
+
+card.classList.add("selected");
+
+selectedCoffee=product.name;
+
+showOptions(card);
+
+document.getElementById("sticky-order").style.display="block";
+document.getElementById("sticky-label").innerText=product.name;
+
+document.getElementById("sticky-order-btn").onclick=()=>{
+placeOrder(product.name);
+};
+
+};
+
+grid.appendChild(card);
+
+});
+
+});
+
+}
+
+window.onload=()=>{
+
+const savedName=localStorage.getItem("customerName");
+
+if(savedName){
+
+document.getElementById("name-screen").style.display="none";
+document.getElementById("menu-screen").style.display="block";
+initMenu();
+
+}
+
+document.getElementById("next-btn").onclick=()=>{
+
+const name=document.getElementById("customer-name").value.trim();
+
+if(!name){
+alert("Vul eerst je naam in");
+return;
+}
+
+localStorage.setItem("customerName",name);
+
+document.getElementById("name-screen").style.display="none";
+document.getElementById("menu-screen").style.display="block";
+
+initMenu();
+
+};
+
+};
+
+</script>
 </head>
 
 <body>
-  <!-- Naam scherm -->
-  <div id="name-screen">
-    <h2>Vul je naam in</h2>
-    <p>Deze naam wordt onthouden op dit apparaat.</p>
-    <input type="text" id="customer-name" placeholder="Naam" autocomplete="name" />
-    <button class="btn btn-primary" id="next-btn">Volgende</button>
-  </div>
 
-  <!-- Menu scherm -->
-  <div id="menu-screen">
-    <div class="topbar">
-      <div class="who">
-        <div class="label">Ingelogd als</div>
-        <div class="name" id="who-name">—</div>
-      </div>
-      <button class="btn btn-ghost" id="change-name-btn">Naam wijzigen</button>
-    </div>
+<div id="name-screen">
+<h2>Vul je naam in</h2>
+<input id="customer-name" placeholder="Naam">
+<br><br>
+<button class="btn btn-primary" id="next-btn">Volgende</button>
+</div>
 
-    <div id="menu-grid" class="grid"></div>
-  </div>
+<div id="menu-screen">
 
-  <!-- Sticky order bar -->
-  <div class="sticky-order" id="sticky-order">
-    <div class="sticky-inner">
-      <div class="sticky-label" id="sticky-label">Kies een product…</div>
-      <button class="btn btn-order" id="sticky-order-btn">☕ Bestelling plaatsen</button>
-    </div>
-  </div>
+<div class="grid" id="menu-grid"></div>
+
+</div>
+
+<div class="sticky-order" id="sticky-order">
+
+<span id="sticky-label"></span>
+
+<button class="btn btn-order" id="sticky-order-btn">
+☕ Bestelling plaatsen
+</button>
+
+</div>
+
 </body>
 </html>
