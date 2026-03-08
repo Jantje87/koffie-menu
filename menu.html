@@ -138,6 +138,74 @@ width:360px;
 font-size:50px;
 }
 
+.machine{
+width:260px;
+margin:auto;
+}
+
+.espresso-flow{
+animation:espressoPour 3s infinite;
+transform-origin:top;
+}
+
+.espresso-flow.right{
+animation-delay:.15s;
+}
+
+@keyframes espressoPour{
+0%{height:0}
+40%{height:48px}
+80%{height:48px}
+100%{height:0}
+}
+
+.coffee-fill{
+animation:cupFill 3s infinite;
+}
+
+@keyframes cupFill{
+0%{height:0;y:175}
+50%{height:16px;y:175}
+80%{height:26px;y:165}
+100%{height:0;y:175}
+}
+
+.crema-fill{
+animation:crema 3s infinite;
+}
+
+@keyframes crema{
+0%{height:0;y:173}
+50%{height:4px;y:173}
+80%{height:6px;y:169}
+100%{height:0;y:173}
+}
+
+.steam{
+opacity:0;
+animation:steamRise 3s infinite;
+}
+
+.s1{animation-delay:.5s}
+.s2{animation-delay:1s}
+
+@keyframes steamRise{
+0%{opacity:0;transform:translateY(10px)}
+50%{opacity:.7}
+100%{opacity:0;transform:translateY(-12px)}
+}
+
+.gauge-needle{
+transform-origin:230px 75px;
+animation:gauge 3s infinite;
+}
+
+@keyframes gauge{
+0%{transform:rotate(-40deg)}
+50%{transform:rotate(30deg)}
+100%{transform:rotate(-40deg)}
+}
+
 </style>
 
 </head>
@@ -168,6 +236,114 @@ font-size:50px;
 <div class="coffee-card" id="coffee-card">
 
 <h2>Je koffie wordt gezet...</h2>
+
+<div class="machine">
+
+<svg viewBox="0 0 320 200">
+
+<!-- machine body -->
+
+<rect x="40" y="30" width="240" height="90" rx="8" fill="#dcdcdc"/>
+<rect x="40" y="30" width="240" height="14" fill="#bfbfbf"/>
+
+<!-- cup warmer -->
+
+<rect x="60" y="20" width="200" height="10" fill="#999"/>
+
+<!-- pressure gauge -->
+
+<circle cx="230" cy="75" r="18" fill="white" stroke="#444" stroke-width="3"/>
+
+<line class="gauge-needle"
+x1="230"
+y1="75"
+x2="230"
+y2="63"
+stroke="#c98a3a"
+stroke-width="3"/>
+
+<!-- grouphead -->
+
+<circle cx="160" cy="100" r="16" fill="#888"/>
+<rect x="150" y="95" width="20" height="20" fill="#666"/>
+
+<!-- portafilter -->
+
+<rect x="135" y="118" width="50" height="8" rx="3" fill="#333"/>
+
+<!-- handle -->
+
+<rect x="175" y="120" width="50" height="6" rx="3" fill="#222"/>
+
+<!-- spouts -->
+
+<rect x="148" y="126" width="6" height="8" fill="#444"/>
+<rect x="166" y="126" width="6" height="8" fill="#444"/>
+
+<!-- espresso streams -->
+
+<rect class="espresso-flow"
+x="150"
+y="134"
+width="4"
+height="0"
+fill="#4a250a"/>
+
+<rect class="espresso-flow right"
+x="168"
+y="134"
+width="4"
+height="0"
+fill="#4a250a"/>
+
+<!-- cup -->
+
+<path
+d="M120 160 L200 160 L190 185 L130 185 Z"
+fill="white"
+stroke="#444"
+stroke-width="3"
+/>
+
+<!-- espresso -->
+
+<rect
+class="coffee-fill"
+x="130"
+y="175"
+width="60"
+height="0"
+fill="#5a2d0c"
+/>
+
+<!-- crema -->
+
+<rect
+class="crema-fill"
+x="130"
+y="173"
+width="60"
+height="0"
+fill="#c98a3a"
+/>
+
+<!-- steam -->
+
+<path class="steam s1"
+d="M150 150 C140 135 160 135 155 115"
+stroke="#bbb"
+stroke-width="3"
+fill="none"/>
+
+<path class="steam s2"
+d="M175 150 C165 135 185 135 180 115"
+stroke="#bbb"
+stroke-width="3"
+fill="none"/>
+
+</svg>
+
+</div>
 
 </div>
 
