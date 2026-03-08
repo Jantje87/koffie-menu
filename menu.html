@@ -68,6 +68,20 @@ object-fit:contain;
 border:3px solid #c98a3a;
 }
 
+.card-options{
+margin-top:8px;
+display:flex;
+flex-direction:column;
+gap:4px;
+font-size:14px;
+}
+
+.card-options label{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
 /* sticky knop */
 
 .sticky-order{
@@ -411,7 +425,12 @@ if(!p.available) return;
 const card=document.createElement("div");
 card.className="card";
 
-card.innerHTML=`<img src="${p.img}"><div>${p.name}</div>`;
+card.innerHTML = `
+<img src="${p.img}">
+<div>${p.name}</div>
+
+<div class="card-options"></div>
+`;
 
 card.onclick=()=>{
 
@@ -420,6 +439,40 @@ document.querySelectorAll(".card").forEach(c=>c.classList.remove("selected"));
 card.classList.add("selected");
 
 selectedCoffee=p.name;
+
+const options = card.querySelector(".card-options");
+
+options.innerHTML="";
+
+/* espresso / lungo */
+
+if(p.name === "Espresso" || p.name === "Lungo"){
+
+options.innerHTML += `
+<label>
+<input type="checkbox" class="milk"> 🥛 Melk
+</label>
+`;
+
+options.innerHTML += `
+<label>
+<input type="checkbox" class="sugar"> 🧊 Suiker
+</label>
+`;
+
+}
+
+/* latte varianten */
+
+if(p.name.includes("Latte")){
+
+options.innerHTML += `
+<label>
+<input type="checkbox" class="sugar"> 🧊 Suiker
+</label>
+`;
+
+}
 
 document.getElementById("sticky-order").style.display="block";
 
@@ -446,12 +499,12 @@ if(!selectedCoffee) return;
 showBrewing();
 playPumpSound();
 
-const orderRef=push(ref(db,"orders"),{
+const orderRef = push(ref(db,"orders"),{
 
 name:localStorage.getItem("customerName"),
 coffee:selectedCoffee,
-milk:false,
-sugar:false,
+milk:milk,
+sugar:sugar,
 completed:false,
 timestamp:Date.now()
 
