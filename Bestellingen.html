@@ -401,22 +401,27 @@ list.appendChild(div);
 
 document.getElementById("clear-orders").onclick = async () => {
 
-const confirmDelete = confirm("Weet je zeker dat je alle bestellingen wilt verwijderen?");
+const confirmed = confirm("Weet je zeker dat je alle bestellingen wilt verwijderen?");
 
-if(!confirmDelete) return;
+if(!confirmed) return;
 
-try{
+const ordersRef = ref(db,"orders");
 
-await remove(ref(db,"orders"));
+onValue(ordersRef, async (snapshot) => {
+
+const promises = [];
+
+snapshot.forEach((child)=>{
+
+promises.push(remove(ref(db,"orders/"+child.key)));
+
+});
+
+await Promise.all(promises);
 
 alert("Alle bestellingen zijn gewist.");
 
-}catch(err){
-
-console.error(err);
-alert("Verwijderen mislukt. Controleer Firebase Rules.");
-
-}
+},{onlyOnce:true});
 
 };
 
