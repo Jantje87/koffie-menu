@@ -399,11 +399,22 @@ list.appendChild(div);
 
 /* clear orders */
 
-document.getElementById("clear-orders").onclick=()=>{
+document.getElementById("clear-orders").onclick = async () => {
 
-if(confirm("Alle bestellingen verwijderen?")){
+const confirmDelete = confirm("Weet je zeker dat je alle bestellingen wilt verwijderen?");
 
-remove(ref(db,"orders"));
+if(!confirmDelete) return;
+
+try{
+
+await remove(ref(db,"orders"));
+
+alert("Alle bestellingen zijn gewist.");
+
+}catch(err){
+
+console.error(err);
+alert("Verwijderen mislukt. Controleer Firebase Rules.");
 
 }
 
