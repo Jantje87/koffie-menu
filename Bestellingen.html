@@ -9,6 +9,28 @@
 
 <style>
 
+.order{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+.order img{
+width:40px;
+height:40px;
+border-radius:8px;
+margin-right:10px;
+object-fit:cover;
+}
+
+.item-left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
 body{
 font-family:Arial;
 background:#f6f4f2;
@@ -297,8 +319,6 @@ function initOrders(){
 
 const list=document.getElementById("order-list");
 
-let knownOrders=new Set();
-
 onValue(ref(db,"orders"),(snapshot)=>{
 
 list.innerHTML="";
@@ -314,26 +334,36 @@ orders.sort((a,b)=>b.timestamp-a.timestamp);
 orders.forEach(order=>{
 
 const div=document.createElement("div");
-
 div.className="order";
 
-if(!knownOrders.has(order.key)){
-div.classList.add("new");
-}
-
-knownOrders.add(order.key);
+const time = new Date(order.timestamp)
+.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 
 div.innerHTML=`
 
 <div class="item-left">
-${order.coffee}
-<br>
-<small>${order.name}</small>
+
+<img src="${order.img || ''}">
+
+<div>
+
+<b>${order.coffee}</b><br>
+
+${order.name}<br>
+
+<small>${time}</small>
+
 </div>
+
+</div>
+
+<div>
 
 <button class="btn-ok">
 ${order.completed?"Voltooid":"Markeer klaar"}
 </button>
+
+</div>
 
 `;
 
