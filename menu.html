@@ -369,6 +369,8 @@ const db=getDatabase(app);
 
 let selectedCoffee=null;
 
+const brewingHTML = document.getElementById("coffee-card").innerHTML;
+
 /* menu */
 
 function initMenu(){
@@ -490,7 +492,13 @@ listenForCompletion(orderRef.key);
 
 function showBrewing(){
 
-document.getElementById("coffee-status").style.display="flex";
+const card = document.getElementById("coffee-card");
+
+/* reset koffiemachine animatie */
+
+card.innerHTML = brewingHTML;
+
+document.getElementById("coffee-status").style.display = "flex";
 
 }
 
