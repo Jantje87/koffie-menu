@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Koffie Admin</title>
+<title>Koffie Admin Dashboard</title>
 
 <style>
 
@@ -13,105 +13,86 @@ body{
 font-family:Arial;
 background:#f6f4f2;
 margin:0;
+}
+
+/* login */
+
+#login-screen{
+max-width:400px;
+margin:120px auto;
+background:white;
+padding:30px;
+border-radius:14px;
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
+text-align:center;
+}
+
+#login-screen input{
+width:100%;
+padding:10px;
+margin:10px 0;
+}
+
+/* admin */
+
+#admin-panel{
+display:none;
+max-width:1100px;
+margin:auto;
 padding:20px;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
 }
 
 h1{
 color:#6d4c41;
 }
 
-.container{
-max-width:1100px;
-margin:auto;
-}
-
 .grid{
 display:grid;
-grid-template-columns:1fr 1.2fr;
-gap:16px;
+grid-template-columns:1fr 1fr;
+gap:20px;
 }
 
 .panel{
 background:white;
-border-radius:16px;
-padding:15px;
-box-shadow:0 10px 24px rgba(0,0,0,0.08);
+border-radius:14px;
+padding:20px;
+box-shadow:0 6px 14px rgba(0,0,0,0.1);
 }
 
-.item{
-border:1px solid #eee;
-border-radius:12px;
-padding:10px;
+.product,
+.order{
+display:flex;
+align-items:center;
+justify-content:space-between;
 margin-bottom:10px;
 }
 
-.product-row{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.product-left{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.product-img{
+.product img,
+.order img{
 width:40px;
 height:40px;
 object-fit:cover;
-border-radius:10px;
+border-radius:8px;
+margin-right:10px;
 }
 
-.order-top{
-display:flex;
-justify-content:space-between;
-}
-
-.order-main{
+.item-left{
 display:flex;
 align-items:center;
-gap:10px;
-font-weight:bold;
 }
 
-.order-img{
-width:36px;
-height:36px;
-border-radius:10px;
-object-fit:cover;
-}
-
-.chips{
-margin-top:6px;
-display:flex;
-gap:6px;
-}
-
-.chip{
-font-size:12px;
-padding:4px 8px;
-border-radius:20px;
-background:#eee;
-}
-
-.chip.on{
-background:#dff5e6;
-color:#1f8a4c;
-}
-
-.chip.off{
-background:#f5e9e4;
-color:#6d4c41;
-}
-
-.btn{
+button{
 padding:8px 12px;
 border:none;
 border-radius:8px;
 cursor:pointer;
-font-weight:bold;
 }
 
 .btn-brand{
@@ -120,284 +101,49 @@ color:white;
 }
 
 .btn-ok{
-background:#1f8a4c;
+background:#4CAF50;
 color:white;
 }
 
 .btn-danger{
-background:#d32f2f;
+background:#c62828;
 color:white;
 }
 
-.is-completed{
-opacity:0.7;
-text-decoration:line-through;
-}
-
-.is-new{
-background:#fff8e1;
-border-color:#ffd54f;
+.new{
+background:#fff3cd;
 }
 
 </style>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-
-import {
-getDatabase,
-ref,
-onValue,
-update,
-remove,
-query,
-orderByChild
-}
-
-from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-const firebaseConfig={
-apiKey:"AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
-authDomain:"koffie-bestellen.firebaseapp.com",
-databaseURL:"https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
-projectId:"koffie-bestellen",
-storageBucket:"koffie-bestellen.firebasestorage.app",
-messagingSenderId:"592791423506",
-appId:"1:592791423506:web:b4901c0cd2cf9094b9e6cb"
-};
-
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-
-let productImages={};
-const seenOrderKeys=new Set();
-
-function beep(){
-
-try{
-
-const ctx=new(window.AudioContext||window.webkitAudioContext)();
-
-const osc=ctx.createOscillator();
-const gain=ctx.createGain();
-
-osc.frequency.value=880;
-
-osc.connect(gain);
-gain.connect(ctx.destination);
-
-gain.gain.setValueAtTime(0.001,ctx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.2,ctx.currentTime+0.01);
-gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);
-
-osc.start();
-osc.stop(ctx.currentTime+0.21);
-
-}catch(e){}
-
-}
-
-function makeImg(className,src){
-
-const img=document.createElement("img");
-
-img.className=className;
-img.src=src||"";
-img.loading="lazy";
-
-img.onerror=()=>img.style.display="none";
-
-return img;
-
-}
-
-const productList=document.getElementById("product-list");
-const orderList=document.getElementById("order-list");
-
-const productsRef=ref(db,"products");
-
-onValue(productsRef,(snapshot)=>{
-
-productList.innerHTML="";
-productImages={};
-
-snapshot.forEach(child=>{
-
-const product=child.val();
-const key=child.key;
-
-productImages[product.name]=product.img||"";
-
-const item=document.createElement("div");
-item.className="item";
-
-const row=document.createElement("div");
-row.className="product-row";
-
-const left=document.createElement("div");
-left.className="product-left";
-
-const img=makeImg("product-img",product.img);
-
-const name=document.createElement("div");
-name.innerText=product.name;
-
-left.appendChild(img);
-left.appendChild(name);
-
-const btn=document.createElement("button");
-btn.className="btn btn-brand";
-btn.innerText=product.available?"Verwijder":"Herstel";
-
-btn.onclick=()=>{
-
-update(ref(db,"products/"+key),{
-available:!product.available
-});
-
-};
-
-row.appendChild(left);
-row.appendChild(btn);
-
-item.appendChild(row);
-
-productList.appendChild(item);
-
-});
-
-});
-
-const ordersRef=ref(db,"orders");
-const ordersQuery=query(ordersRef,orderByChild("timestamp"));
-
-onValue(ordersQuery,(snapshot)=>{
-
-orderList.innerHTML="";
-
-let orders=[];
-
-snapshot.forEach(child=>{
-
-orders.push({
-...child.val(),
-key:child.key
-});
-
-});
-
-orders.reverse();
-
-let newOrders=0;
-
-orders.forEach(order=>{
-
-const isNew=!seenOrderKeys.has(order.key);
-
-seenOrderKeys.add(order.key);
-
-const item=document.createElement("div");
-item.className="item";
-
-if(order.completed) item.classList.add("is-completed");
-
-if(isNew && !order.completed){
-
-item.classList.add("is-new");
-newOrders++;
-
-}
-
-const top=document.createElement("div");
-top.className="order-top";
-
-const main=document.createElement("div");
-main.className="order-main";
-
-const img=makeImg("order-img",productImages[order.coffee]);
-
-const text=document.createElement("span");
-text.innerText=order.name+" — "+order.coffee;
-
-main.appendChild(img);
-main.appendChild(text);
-
-const time=document.createElement("div");
-time.innerText=new Date(order.timestamp).toLocaleTimeString();
-
-top.appendChild(main);
-top.appendChild(time);
-
-const chips=document.createElement("div");
-chips.className="chips";
-
-const milk=document.createElement("span");
-milk.className="chip "+(order.milk?"on":"off");
-milk.innerText="Melk";
-
-const sugar=document.createElement("span");
-sugar.className="chip "+(order.sugar?"on":"off");
-sugar.innerText="Suiker";
-
-chips.appendChild(milk);
-chips.appendChild(sugar);
-
-const actions=document.createElement("div");
-
-const btn=document.createElement("button");
-btn.className="btn btn-ok";
-
-if(order.completed){
-
-btn.innerText="☕ Klaar";
-btn.disabled=true;
-
-}else{
-
-btn.innerText="☕ Markeer als klaar";
-
-btn.onclick=()=>{
-
-update(ref(db,"orders/"+order.key),{
-completed:true
-});
-
-};
-
-}
-
-actions.appendChild(btn);
-
-item.appendChild(top);
-item.appendChild(chips);
-item.appendChild(actions);
-
-orderList.appendChild(item);
-
-});
-
-if(newOrders>0) beep();
-
-});
-
-document.getElementById("clear-orders-btn").onclick=()=>{
-
-if(!confirm("Alle bestellingen verwijderen?")) return;
-
-remove(ref(db,"orders"));
-
-};
-
-</script>
 
 </head>
 
 <body>
 
-<div class="container">
+<!-- LOGIN -->
+
+<div id="login-screen">
+
+<h2>Admin Login</h2>
+
+<input id="admin-email" placeholder="Email">
+<input id="admin-password" type="password" placeholder="Password">
+
+<button id="login-btn">Login</button>
+
+</div>
+
+<!-- ADMIN -->
+
+<div id="admin-panel">
+
+<header>
 
 <h1>Koffie Dashboard</h1>
+
+<button id="logout-btn">Logout</button>
+
+</header>
 
 <div class="grid">
 
@@ -413,9 +159,7 @@ remove(ref(db,"orders"));
 
 <h2>Bestellingen</h2>
 
-<button id="clear-orders-btn" class="btn btn-danger">
-Wis alle bestellingen
-</button>
+<button id="clear-orders" class="btn-danger">Wis alle bestellingen</button>
 
 <div id="order-list"></div>
 
@@ -424,6 +168,204 @@ Wis alle bestellingen
 </div>
 
 </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+onValue,
+update,
+remove
+}
+from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged,
+signOut
+}
+from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyAjLIU_c7tzLrajP0pJ5jo949SkiF5ELQY",
+authDomain:"koffie-bestellen.firebaseapp.com",
+databaseURL:"https://koffie-bestellen-default-rtdb.europe-west1.firebasedatabase.app",
+projectId:"koffie-bestellen",
+storageBucket:"koffie-bestellen.firebasestorage.app",
+messagingSenderId:"592791423506",
+appId:"1:592791423506:web:b4901c0cd2cf9094b9e6cb"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+/* login */
+
+document.getElementById("login-btn").onclick = () => {
+
+signInWithEmailAndPassword(
+auth,
+document.getElementById("admin-email").value,
+document.getElementById("admin-password").value
+);
+
+};
+
+/* auth state */
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+document.getElementById("login-screen").style.display="none";
+document.getElementById("admin-panel").style.display="block";
+
+initProducts();
+initOrders();
+
+}
+
+});
+
+/* logout */
+
+document.getElementById("logout-btn").onclick = () => {
+
+signOut(auth);
+
+location.reload();
+
+};
+
+/* producten */
+
+function initProducts(){
+
+const list=document.getElementById("product-list");
+
+onValue(ref(db,"products"),(snapshot)=>{
+
+list.innerHTML="";
+
+snapshot.forEach(child=>{
+
+const p=child.val();
+const key=child.key;
+
+const div=document.createElement("div");
+div.className="product";
+
+div.innerHTML=`
+
+<div class="item-left">
+<img src="${p.img}">
+${p.name}
+</div>
+
+<button class="btn-brand">
+${p.available?"Verwijder":"Herstel"}
+</button>
+
+`;
+
+div.querySelector("button").onclick=()=>{
+
+update(ref(db,"products/"+key),{
+available:!p.available
+});
+
+};
+
+list.appendChild(div);
+
+});
+
+});
+
+}
+
+/* orders */
+
+function initOrders(){
+
+const list=document.getElementById("order-list");
+
+let knownOrders=new Set();
+
+onValue(ref(db,"orders"),(snapshot)=>{
+
+list.innerHTML="";
+
+let orders=[];
+
+snapshot.forEach(child=>{
+orders.push({...child.val(),key:child.key});
+});
+
+orders.sort((a,b)=>b.timestamp-a.timestamp);
+
+orders.forEach(order=>{
+
+const div=document.createElement("div");
+
+div.className="order";
+
+if(!knownOrders.has(order.key)){
+div.classList.add("new");
+}
+
+knownOrders.add(order.key);
+
+div.innerHTML=`
+
+<div class="item-left">
+${order.coffee}
+<br>
+<small>${order.name}</small>
+</div>
+
+<button class="btn-ok">
+${order.completed?"Voltooid":"Markeer klaar"}
+</button>
+
+`;
+
+div.querySelector("button").onclick=()=>{
+
+update(ref(db,"orders/"+order.key),{
+completed:true
+});
+
+};
+
+list.appendChild(div);
+
+});
+
+});
+
+}
+
+/* clear orders */
+
+document.getElementById("clear-orders").onclick=()=>{
+
+if(confirm("Alle bestellingen verwijderen?")){
+
+remove(ref(db,"orders"));
+
+}
+
+};
+
+</script>
 
 </body>
 </html>
